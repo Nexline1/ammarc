@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 160" width="180" height="160">
+<g stroke="#2A2F36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+<path d="M24 16V134M36 16V134M48 16V134M60 16V134M72 16V134M14 28H86M14 40H86M14 52H86M14 64H86M14 76H86M14 88H86M14 100H86M14 112H86M14 124H86M104 16V134M116 16V134M128 16V134M140 16V134M152 16V134M94 28H166M94 40H166M94 52H166M94 64H166M94 76H166M94 88H166M94 100H166M94 112H166M94 124H166" stroke-width="1.5"/>
+<rect x="14" y="10" width="72" height="6" fill="#F2C230"/>
+<rect x="94" y="10" width="72" height="6" fill="#F2C230"/>
+<rect x="14" y="134" width="72" height="14" fill="#F2C230"/>
+<rect x="94" y="134" width="72" height="14" fill="#F2C230"/>
+<rect x="6" y="6" width="8" height="144" fill="#F2C230"/>
+<rect x="86" y="6" width="8" height="144" fill="#F2C230"/>
+<rect x="166" y="6" width="8" height="144" fill="#F2C230"/>
+<rect x="4" y="150" width="12" height="5" fill="#8E97A1"/>
+<rect x="84" y="150" width="12" height="5" fill="#8E97A1"/>
+<rect x="164" y="150" width="12" height="5" fill="#8E97A1"/>
+</g>
+</svg>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Council Report</title>
+<style>
+  :root { --ink:#16191d; --mute:#5b636e; --line:#e4e7eb; --bg:#f5f6f8; --cu:#cf5a1e; --ok:#2e8b57; --warn:#b5880a; --bad:#d63b2f; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 40px 16px 64px; }
+  h1 { font-size: 26px; line-height: 1.2; letter-spacing: -.02em; margin: 0 0 6px; }
+  h2 { font-size: 17px; margin: 28px 0 10px; }
+  .q { color: var(--mute); margin: 0 0 24px; }
+  .card { background: #fff; border-radius: 16px; padding: 20px 22px; box-shadow: 0 1px 2px rgba(22,25,29,.06), 0 8px 24px rgba(42,47,54,.06); margin-bottom: 16px; }
+  .verdict { border-left: 4px solid var(--cu); }
+  ul { margin: 6px 0 0; padding-left: 20px; }
+  li { margin: 4px 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .adv { background: #fff; border-radius: 12px; padding: 12px 14px; box-shadow: inset 0 0 0 1px var(--line); }
+  .adv b { display: block; }
+  .tag { display: inline-block; margin-top: 6px; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .tag.go { background: #e8f4ec; color: var(--ok); } .tag.mod { background: #fbf3dc; color: var(--warn); } .tag.no { background: #fbe7e5; color: var(--bad); }
+  details { background: #fff; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line); margin-bottom: 8px; }
+  summary { cursor: pointer; padding: 12px 16px; font-weight: 600; }
+  details p, details ul { margin: 0; padding: 0 16px 14px 32px; }
+  details p { padding-left: 16px; }
+  footer { color: var(--mute); font-size: 13px; margin-top: 32px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Council report: Ammarc (formerly Armature)</h1>
+  <p class="q">Should we build Ammar's idea-to-image platform as specified, and how do we make it understand him? (Five advisors, anonymous peer review, chairman synthesis. 21 Oct 2026.)</p>
+
+  <section class="card verdict">
+    <h2 style="margin-top:0">Recommendation</h2>
+    <p>Build it within the nephew's layout (elements, board, assistant), around a single loop: <b>photo → mark or drop → one sentence → only that area changes → before/after → pitch slide</b>. Three guarantees make it obey him literally:</p>
+    <ul>
+      <li><b>Paste-back.</b> The original pixels outside the marked area are restored byte for byte.</li>
+      <li><b>App-drawn dimensions.</b> The app draws measurements and notes. The image model never draws them, and the slide is labelled "concept".</li>
+      <li><b>Placed elements.</b> Dropped elements carry their hinge side and size, visible before rendering, so placement is literal.</li>
+    </ul>
+    <p><b>First step:</b> confirm Alba's photo policy (answered: allowed), then run a $5-capped live proof on about 10 of his real requests before he sees it. Pass bar: 8 of 10 literal edits.</p>
+  </section>
+
+  <h2>Where the advisors stood</h2>
+  <div class="grid">
+    <div class="adv"><b>Executor</b>Build it, not as specified. Test the core with a script first. Paste-back is the one feature that matters.<span class="tag mod">build, reshaped</span></div>
+    <div class="adv"><b>Contrarian</b>The core is unproven, and mocks hide that. He usually sends a sentence with no circle. Dimensions are a trap.<span class="tag no">not as specified</span></div>
+    <div class="adv"><b>First Principles</b>The product is one loop plus a slide. Cut the generic library and hidden memory.<span class="tag no">rebuild the question</span></div>
+    <div class="adv"><b>Outsider</b>What does he see in the first 10 seconds? Show the hinge on the image, and stream while he waits.<span class="tag mod">one clear flow</span></div>
+    <div class="adv"><b>Expansionist</b>The pitch is the product. His own parts library and rules become an asset for Gulf smelters.<span class="tag go">build, bigger</span></div>
+  </div>
+
+  <h2>Where the council agrees</h2>
+  <div class="card"><ul>
+    <li>The risk is literal obedience, not the UI.</li>
+    <li>Paste-back is the guarantee.</li>
+    <li>The app draws dimensions.</li>
+    <li>Structured fields (hinge, size, keep-list) beat free prose.</li>
+    <li>The pitch slide is the real deliverable.</li>
+    <li>Learned rules must be visible and editable.</li>
+    <li>Test the core interactions on his phone.</li>
+  </ul></div>
+
+  <h2>Where it clashes, and how it was resolved</h2>
+  <div class="card"><ul>
+    <li><b>Cut the library, chat and voice, or keep them?</b> Keep them, as the nephew required. The library earns its place because dropped elements are placed exactly.</li>
+    <li><b>Auto-fix loop or not?</b> A background check offers a one-tap "Fix it". It never spends automatically.</li>
+    <li><b>Mock-first or real-first?</b> Build on mocks, with the eval harness ready. Then a $5 live proof run when the keys arrive.</li>
+  </ul></div>
+
+  <h2>Blind spots caught in peer review</h2>
+  <div class="card"><ul>
+    <li><b>Dropped elements can be composited deterministically</b>, so the model only blends them in. Peer review rated this the strongest new idea.</li>
+    <li>Agree a pass/fail bar with Ammar (8 of 10), and watch him use it unassisted.</li>
+    <li>Keep the pitch honest: label it as a concept and put the original photo beside the render.</li>
+    <li>Ops: keys stay on a server, there is a daily image cap, and the nephew maintains it.</li>
+    <li>Paste-back needs colour matching. Strip EXIF/GPS from uploads. Test Gulf-Arabic and mixed-language dictation.</li>
+  </ul></div>
+
+  <h2>Peer review</h2>
+  <details><summary>Strongest answer: Executor (5 of 5 reviewers)</summary><p>It turned critique into a cheap test, named the deterministic feature, gave a cut list and a schedule, and priced real testing.</p></details>
+  <details><summary>Biggest blind spot: Expansionist (5 of 5 reviewers)</summary><p>It treated the edit engine as solved, added scope, and widened the confidentiality exposure.</p></details>
+  <details><summary>Full transcript</summary><p>See <code>council-transcript.md</code> next to this file.</p></details>
+
+  <footer>LLM Council (Karpathy method). Five advisors and five reviewers ran on Sonnet. The chairman synthesis was written in the main session after the Fable call hit a usage limit.</footer>
+</main>
+</body>
+</html>

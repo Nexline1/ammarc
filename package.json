@@ -1,0 +1,43 @@
+{
+  "name": "ammarc",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Ammarc: say it, see it built. Idea-to-image studio for plant improvements (Claude plans, OpenAI renders).",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --ignore ./data/** server/index.ts --dev",
+    "preview": "tsx server/index.ts --dev",
+    "build": "tsc --noEmit && vite build",
+    "start": "tsx server/index.ts",
+    "test": "vitest run",
+    "e2e": "playwright test",
+    "eval": "tsx evals/run.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.137.0",
+    "express": "^5.3.0",
+    "konva": "^10.9.0",
+    "motion": "^14.4.0",
+    "openai": "^7.39.0",
+    "pptxgenjs": "^4.0.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-konva": "^19.3.2",
+    "tsx": "^4.23.15",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5"
+  }
+}

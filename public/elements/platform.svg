@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 100" width="180" height="100">
+<g stroke="#2A2F36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+<polygon points="14,46 166,46 176,60 4,60" fill="#E6E9ED"/>
+<path d="M33 46L25.5 60M52 46L47 60M71 46L68.5 60M90 46V60M109 46L111.5 60M128 46L133 60M147 46L154.5 60M9 53H171" stroke-width="1.5"/>
+<rect x="15" y="6" width="6" height="40" fill="#F2C230"/>
+<rect x="87" y="6" width="6" height="40" fill="#F2C230"/>
+<rect x="159" y="6" width="6" height="40" fill="#F2C230"/>
+<rect x="12" y="6" width="156" height="6" rx="3" fill="#F2C230"/>
+<rect x="12" y="26" width="156" height="4" rx="2" fill="#F2C230"/>
+<rect x="4" y="60" width="172" height="9" fill="#C9CFD6"/>
+<rect x="20" y="69" width="7" height="23" fill="#E6E9ED"/>
+<rect x="87" y="69" width="6" height="23" fill="#E6E9ED"/>
+<rect x="153" y="69" width="7" height="23" fill="#E6E9ED"/>
+<path d="M27 84H87M93 84H153" stroke-width="1.5"/>
+<rect x="16" y="92" width="15" height="4" fill="#8E97A1"/>
+<rect x="82" y="92" width="16" height="4" fill="#8E97A1"/>
+<rect x="149" y="92" width="15" height="4" fill="#8E97A1"/>
+</g>
+</svg>

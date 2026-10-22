@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+<g stroke="#2A2F36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+<path d="M16 24L24 16M16 36L36 16M16 48L48 16M16 60L60 16M16 72L72 16M16 84L84 16M28 84L84 28M40 84L84 40M52 84L84 52M64 84L84 64M76 84L84 76M16 76L24 84M16 64L36 84M16 52L48 84M16 40L60 84M16 28L72 84M16 16L84 84M28 16L84 72M40 16L84 60M52 16L84 48M64 16L84 36M76 16L84 24" stroke-width="1.5"/>
+<path d="M6 6H94V94H6Z M16 16V84H84V16Z" fill="#F2C230" fill-rule="evenodd"/>
+<circle cx="11" cy="11" r="2" fill="#E6E9ED" stroke-width="1.5"/>
+<circle cx="89" cy="11" r="2" fill="#E6E9ED" stroke-width="1.5"/>
+<circle cx="11" cy="89" r="2" fill="#E6E9ED" stroke-width="1.5"/>
+<circle cx="89" cy="89" r="2" fill="#E6E9ED" stroke-width="1.5"/>
+</g>
+</svg>

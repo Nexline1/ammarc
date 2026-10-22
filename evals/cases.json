@@ -1,0 +1,92 @@
+[
+  {
+    "id": "door-marked",
+    "note": "His classic one-liner with a red circle, no element dropped: hinge must be stated as an assumption, never silently guessed.",
+    "sentence": "put a metal door here",
+    "scene": { "marks": [{ "type": "pen", "points": [[600, 500], [760, 500], [760, 760], [600, 760], [600, 505]] }] },
+    "expect": { "action": ["edit"], "region": ["marks", "marks_and_elements"], "hingeAssumption": true }
+  },
+  {
+    "id": "door-element",
+    "note": "Dropped inspection door with the hinge on the left: the plan must carry the hinge side and the 90x60 size.",
+    "sentence": "make this a real steel inspection door",
+    "scene": { "elements": [{ "ref": "inspection-door", "name": "Inspection door", "prompt": "hinged steel inspection door with lever latch", "x": 700, "y": 600, "w": 300, "h": 200, "hinge": "left", "sizeCm": [90, 60] }] },
+    "expect": { "action": ["edit"], "region": ["elements", "marks_and_elements"], "orientation": "left", "includes": ["90"] }
+  },
+  {
+    "id": "make-3d",
+    "note": "\"Make it 3D\" = whole-image industrial render keeping geometry.",
+    "sentence": "make it 3D",
+    "scene": {},
+    "expect": { "action": ["generate", "edit"], "region": ["whole"], "style": "3d_render" }
+  },
+  {
+    "id": "arabic-handrail",
+    "note": "Arabic sentence: reply must come back in Arabic.",
+    "sentence": "حط درابزين هنا",
+    "scene": { "marks": [{ "type": "pen", "points": [[300, 300], [700, 300], [700, 420], [300, 420], [305, 300]] }] },
+    "expect": { "action": ["edit"], "region": ["marks", "marks_and_elements"], "arabicReply": true }
+  },
+  {
+    "id": "lower-duct",
+    "note": "Move by a stated amount: keep the number verbatim and expand the region to cover old and new positions.",
+    "sentence": "lower this duct by 20 cm, keep its shape",
+    "scene": { "marks": [{ "type": "pen", "points": [[200, 200], [1300, 200], [1300, 360], [200, 360], [205, 200]] }] },
+    "expect": { "action": ["edit"], "region": ["marks", "marks_and_elements"], "includes": ["20 cm"], "expand": true, "live": true }
+  },
+  {
+    "id": "remove-marked-only",
+    "note": "Remove only the marked item; preserve list must name neighbours.",
+    "sentence": "remove the marked item only",
+    "scene": { "marks": [{ "type": "pen", "points": [[900, 900], [1000, 900], [1000, 1000], [900, 1000], [905, 900]] }] },
+    "expect": { "action": ["edit"], "region": ["marks", "marks_and_elements"], "preserve": true }
+  },
+  {
+    "id": "no-location",
+    "note": "Placement with nothing marked: the only allowed question is 'tap where'.",
+    "sentence": "add safety grating here",
+    "scene": {},
+    "photo": true,
+    "expect": { "action": ["reply"] }
+  },
+  {
+    "id": "cylinders-gap",
+    "note": "Spec book: 5 cm between cylinders.",
+    "sentence": "add two more cylinders next to these, 5 cm apart",
+    "scene": { "marks": [{ "type": "pen", "points": [[400, 600], [900, 600], [900, 1100], [400, 1100], [405, 600]] }] },
+    "expect": { "action": ["edit"], "region": ["marks", "marks_and_elements"], "includes": ["5 cm"], "live": true }
+  },
+  {
+    "id": "wire-rope-dimension",
+    "note": "Dimension mark supplies the size: 15 cm wire rope at the arrow.",
+    "sentence": "safety wire rope here",
+    "scene": { "marks": [{ "type": "arrow", "points": [[500, 300], [700, 500]] }, { "type": "dimension", "points": [[650, 560], [760, 560]], "text": "15 cm" }] },
+    "expect": { "action": ["edit"], "region": ["marks", "marks_and_elements"], "includes": ["15"], "live": true }
+  },
+  {
+    "id": "make-part",
+    "note": "New library element on request.",
+    "sentence": "make me a flue-end obturator part",
+    "scene": {},
+    "expect": { "action": ["make_part"] }
+  },
+  {
+    "id": "hinge-correction",
+    "note": "A correction is authoritative and should become a rule.",
+    "sentence": "no, the hinge should be on the right",
+    "history": [{ "role": "user", "text": "put a metal door here" }, { "role": "agent", "text": "Adding a hinged steel door, hinge on the left." }],
+    "scene": { "marks": [{ "type": "pen", "points": [[600, 500], [760, 500], [760, 760], [600, 760], [600, 505]] }] },
+    "expect": { "action": ["edit"], "orientation": "right", "rule": true, "live": true }
+  },
+  {
+    "id": "blank-trolley",
+    "note": "Blank board with dropped elements -> render the whole idea in 3D.",
+    "sentence": "render this as a lifting trolley with centre gearbox lifting",
+    "blank": true,
+    "scene": { "elements": [
+      { "ref": "lifting-trolley", "name": "Lifting trolley", "prompt": "steel lifting trolley with central lifting platform and push handle", "x": 768, "y": 800, "w": 600, "h": 700, "hinge": null, "sizeCm": [120, 150] },
+      { "ref": "gearbox", "name": "Gearbox", "prompt": "cast iron gearbox with input and output shafts", "x": 768, "y": 760, "w": 200, "h": 160, "hinge": null, "sizeCm": [50, 40] }
+    ] },
+    "expect": { "action": ["generate", "edit"], "style": "3d_render" }
+  }
+]

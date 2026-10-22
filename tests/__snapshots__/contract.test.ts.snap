@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`compilePrompt > produces the fixed CHANGE / ITEMS / KEEP EXACTLY / STYLE structure 1`] = `
+"CHANGE: Replace the placeholder with a real steel inspection door.
+
+ITEMS:
+- E1: hinged steel inspection door; material: steel; size: 90 × 60 cm (for proportion only); orientation: hinge on the left; position: as placed; it replaces the flat line-drawing placeholder of a inspection door at that exact spot; keep its placement, scale and angle
+
+KEEP EXACTLY (do not move, remove, restyle or recolour):
+- yellow handrail on the left
+- gas hose under the burner ramp
+- everything outside the edited area: walls, floor, pipes, ducts, grating, handrails, doors, plates, labels and their positions
+- camera angle, framing, perspective, lighting, colours, contrast and saturation
+
+STYLE: Photorealistic, matching the existing photo exactly: same camera angle, lens, lighting, white balance, grain and level of detail.
+Do not add text, labels, dimension lines, arrows, watermarks or red marks. Do not add anything that was not asked for."
+`;

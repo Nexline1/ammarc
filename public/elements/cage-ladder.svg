@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 240" width="80" height="240">
+<g stroke="#2A2F36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+<path d="M32 12h16v4H32zM32 26h16v4H32zM32 40h16v4H32zM32 54h16v4H32zM32 68h16v4H32zM32 82h16v4H32zM32 96h16v4H32zM32 110h16v4H32zM32 124h16v4H32zM32 138h16v4H32zM32 152h16v4H32zM32 166h16v4H32zM32 180h16v4H32zM32 194h16v4H32zM32 208h16v4H32zM32 222h16v4H32z" fill="#C9CFD6" stroke-width="1.5"/>
+<rect x="27" y="4" width="5" height="232" rx="2" fill="#E6E9ED"/>
+<rect x="48" y="4" width="5" height="232" rx="2" fill="#E6E9ED"/>
+<rect x="24" y="232" width="11" height="4" fill="#8E97A1"/>
+<rect x="45" y="232" width="11" height="4" fill="#8E97A1"/>
+<ellipse cx="40" cy="30" rx="30" ry="7"/>
+<ellipse cx="40" cy="58" rx="30" ry="7"/>
+<ellipse cx="40" cy="86" rx="30" ry="7"/>
+<ellipse cx="40" cy="114" rx="30" ry="7"/>
+<path d="M10 30V114M70 30V114M22 36V120M58 36V120"/>
+</g>
+</svg>
