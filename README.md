@@ -26,6 +26,12 @@ With real keys and no `APP_PASSWORD`, the server only answers on this computer. 
 
 `DAILY_IMAGE_CAP` and `DAILY_CLAUDE_CAP` limit the paid calls per day.
 
+## Deploy (Render)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Nexline1/ammarc)
+
+`render.yaml` sets up one web service (Frankfurt, Starter plan) with a 1 GB disk for projects and photos. Render asks for `APP_PASSWORD` when you create it, and the app refuses to start on Render without one. Add `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` later under **Environment** to leave demo mode. Every push to `main` redeploys.
+
 ## Check
 
 ```bash

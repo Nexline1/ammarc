@@ -1,0 +1,35 @@
+# Render Blueprint: deploys Ammarc (client + server) as one web service.
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: ammarc
+    runtime: node
+    plan: starter            # needed for the persistent disk (free instances lose files on every restart)
+    region: frankfurt        # closest Render region to Bahrain
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/status
+    autoDeploy: true         # every push to main redeploys
+    disk:
+      name: ammarc-data      # projects, photos, versions, rules, parts
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: DATA_DIR
+        value: /var/data
+      - key: HOST
+        value: 0.0.0.0
+      - key: APP_PASSWORD     # Render asks for it when you create the service; the app won't start on Render without it
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ANTHROPIC_API_KEY  # leave empty for demo mode; add later in the dashboard
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: DAILY_IMAGE_CAP
+        value: "60"
+      - key: DAILY_CLAUDE_CAP
+        value: "300"

@@ -17,6 +17,11 @@ const DAILY_CLAUDE_CAP = Number(process.env.DAILY_CLAUDE_CAP || 300);
 const RATE_PER_MIN = Number(process.env.RATE_PER_MIN || 20);
 // With real keys and no password, only this computer may reach it (paid endpoints must never be open on the network).
 const HOST = process.env.HOST || (!MOCK && !PASSWORD ? '127.0.0.1' : '0.0.0.0');
+// On a public host his plant photos and the paid endpoints must never be open: no password, no start.
+if (process.env.RENDER && !PASSWORD) {
+  console.error('Refusing to start: set APP_PASSWORD in the Render dashboard (Environment).');
+  process.exit(1);
+}
 
 // Real clients load only when keys exist, so demo mode never touches the network.
 const claude = MOCK ? null : await import('./claude.ts');
