@@ -150,6 +150,9 @@ function Parts({ compact }: { compact: boolean }) {
   return (
     <div className="lib-body">
       <div className="part-actions">
+        <button className="action-card" onClick={() => { set({ tool: 'cutout', selected: null, hint: t('hintCutout') }); after(); }}>
+          <Icon name="select" size={22} /><b>{t('tapCut')}</b><span>{t('tapCutSub')}</span>
+        </button>
         <button className="action-card" onClick={() => { set({ tool: 'lasso', selected: null, hint: t('hintLasso') }); after(); }}>
           <Icon name="lasso" size={22} /><b>{t('cutFromPhoto')}</b><span>{t('cutSub')}</span>
         </button>

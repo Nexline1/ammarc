@@ -99,6 +99,21 @@ export function pasteBack(base: Uint8ClampedArray, result: Uint8ClampedArray, so
   return out;
 }
 
+/** Bounding box of the visible (non-transparent) pixels, or null when the image is empty. */
+export function alphaBounds(rgba: Uint8ClampedArray, w: number, h: number, threshold = 8) {
+  let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      if (rgba[(y * w + x) * 4 + 3] <= threshold) continue;
+      if (x < x0) x0 = x;
+      if (x > x1) x1 = x;
+      if (y < y0) y0 = y;
+      if (y > y1) y1 = y;
+    }
+  }
+  return x1 < 0 ? null : { x0, y0, x1: x1 + 1, y1: y1 + 1 };
+}
+
 /**
  * Which scene items define the editable region. Unless the change is whole-image, everything he marked
  * or dropped is editable: he put it there for a reason, and Claude naming only part of it must never

@@ -1,6 +1,6 @@
 // Demo mode (no API keys): a rule-based stand-in for Claude and an echo renderer.
 // It exercises the full flow; it says nothing about real image quality.
-import type { Check, Pitch, Plan, RenderEvent, TurnRequest } from '../shared/types.ts';
+import type { Check, Email, Pitch, Plan, RenderEvent, TurnRequest } from '../shared/types.ts';
 
 const AR = /[؀-ۿ]/;
 const has = (s: string, re: RegExp) => re.test(s.toLowerCase());
@@ -73,6 +73,13 @@ export const mockPitch = (lang: 'en' | 'ar', history: { role: string; text: stri
   return lang === 'ar'
     ? { title: 'مقترح تحسين في الموقع', hazard: 'الوضع الحالي يسبب خطرًا أو تأخيرًا في العمل.', consequence: 'احتمال إصابة أو توقف في الإنتاج.', solution: last || 'التعديل الموضح في الصورة.' }
     : { title: 'Proposed site improvement', hazard: 'The current setup creates a risk or slows the work.', consequence: 'Possible injury or production downtime.', solution: last || 'The change shown in the image.' };
+};
+
+export const mockEmail = (lang: 'en' | 'ar', pitches: Pitch[]): Email => {
+  const lines = pitches.map((p, i) => `${i + 1}. ${p.title}: ${p.solution}`).join('\n');
+  return lang === 'ar'
+    ? { subject: `مقترح تحسين: ${pitches[0].title}`, body: `السلام عليكم،\n\nأقترح التحسينات التالية في الموقع:\n${lines}\n\nمرفق الصور التوضيحية والشريحة. أتمنى نحدد وقت قصير لزيارة الموقع.\n\nعمّار` }
+    : { subject: `Improvement proposal: ${pitches[0].title}`, body: `Hello,\n\nI would like to propose the following improvement${pitches.length > 1 ? 's' : ''}:\n${lines}\n\nConcept images and a slide are attached. Could we find a short time for a site visit?\n\nAmmar` };
 };
 
 export const mockTranscribe = (lang: string) => (lang === 'ar' ? 'حط باب حديد هنا' : 'put a metal door here');

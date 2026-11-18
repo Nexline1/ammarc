@@ -3,7 +3,7 @@ import { useSyncExternalStore } from 'react';
 import type { Lang, Mark, Memory, Message, Project, Scene, SceneElement } from '../shared/types.ts';
 import { api } from './api.ts';
 
-export type Tool = 'select' | 'pen' | 'arrow' | 'dimension' | 'text' | 'eraser' | 'lasso';
+export type Tool = 'select' | 'pen' | 'arrow' | 'dimension' | 'text' | 'eraser' | 'lasso' | 'cutout';
 export type Sheet = 'elements' | 'chat' | 'versions' | 'export' | 'memory' | 'projects';
 export type LeftTab = 'elements' | 'parts' | 'versions' | 'ideas';
 export type Part = { file: string; name: string };

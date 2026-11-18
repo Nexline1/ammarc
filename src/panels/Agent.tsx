@@ -55,6 +55,8 @@ export function Composer({ autoFocus }: { autoFocus?: boolean }) {
   useEffect(() => { if (autoFocus || draft.endsWith(': ')) ref.current?.focus(); }, [autoFocus, draft]);
   const send = () => { if (draft.trim() && !busy) void runTurn(draft); };
   return (
+    <>
+    <ViewChips />
     <form className="composer" onSubmit={(e) => { e.preventDefault(); send(); }}>
       <textarea
         ref={ref}
@@ -72,6 +74,24 @@ export function Composer({ autoFocus }: { autoFocus?: boolean }) {
       </button>
       <button type="submit" className="icon-btn send" aria-label={t('send')} disabled={!draft.trim() || !!busy}><Icon name="send" /></button>
     </form>
+    </>
+  );
+}
+
+/** One tap for the views he keeps asking for; each becomes a new version branching from the current one. */
+function ViewChips() {
+  const t = useT();
+  const busy = useStore((s) => !!s.busy);
+  const hasPicture = useStore((s) => !!s.project?.versions.some((v) => v.note !== 'blank') || !!s.project?.scene.elements.length);
+  if (!hasPicture) return null;
+  const views = [['viewSide', 'sayViewSide'], ['viewCut', 'sayViewCut'], ['viewExploded', 'sayViewExploded'], ['view3d', 'sayView3d']] as const;
+  return (
+    <div className="view-chips" role="group" aria-label={t('views')}>
+      <span>{t('views')}</span>
+      {views.map(([label, say]) => (
+        <button key={label} className="chip" disabled={busy} onClick={() => void runTurn(t(say))}>{t(label)}</button>
+      ))}
+    </div>
   );
 }
 

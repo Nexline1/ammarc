@@ -47,6 +47,22 @@ export async function makePart(plan: Plan): Promise<Buffer> {
   return Buffer.from(b64, 'base64');
 }
 
+/** The photo arrives with a red dot on one piece of equipment; return just that piece on transparency. */
+export async function cutout(image: string, size: string): Promise<string> {
+  const res = await api().images.edit({
+    model: FAST_MODEL,
+    image: await toFile(fromDataUrl(image), 'photo.png', { type: 'image/png' }),
+    prompt: 'Isolate only the single piece of equipment under the red dot, exactly as it appears in the photo (same angle, shape, colours and details). Remove everything else, including the red dot, and place it on a fully transparent background. No shadow, no floor, no text.',
+    size,
+    quality: QUALITY,
+    background: 'transparent',
+    output_format: 'png',
+  });
+  const b64 = 'data' in res ? res.data?.[0]?.b64_json : undefined;
+  if (!b64) throw new Error('No image returned.');
+  return b64;
+}
+
 export async function transcribe(audio: Buffer, mime: string): Promise<string> {
   const ext = mime.includes('mp4') ? 'mp4' : mime.includes('ogg') ? 'ogg' : 'webm';
   const res = await api().audio.transcriptions.create({ file: await toFile(audio, `speech.${ext}`, { type: mime }), model: TRANSCRIBE_MODEL });

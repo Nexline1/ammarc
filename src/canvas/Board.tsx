@@ -7,8 +7,9 @@ import { Arrow, Circle, Group, Image as KImage, Label, Layer, Line, Rect, Stage,
 import type { Mark, SceneElement } from '../../shared/types.ts';
 import { api, fileUrl, upload } from '../api.ts';
 import { tr, useT } from '../i18n.ts';
-import { addMark, get, removeItem, set, toast, updateElement, useStore, type Part } from '../store.ts';
-import { canvas } from './raster.ts';
+import { addMark, editScene, get, removeItem, set, toast, uid, updateElement, useStore, type Part } from '../store.ts';
+import { alphaBounds, apiSize, canvas, draw, loadImage, pixels } from './raster.ts';
+import { cmText, lengthPx, parseCm } from './scale.ts';
 
 export const RED = '#E5262E';
 const DIM = '#2457A6';
@@ -228,6 +229,7 @@ export function Board({ onFiles }: { onFiles: (files: FileList) => void }) {
         gesture.current = { kind: 'draw' };
         break;
       case 'text':
+      case 'cutout':
         gesture.current = { kind: 'tap', at: p };
         break;
       case 'eraser':
@@ -269,6 +271,10 @@ export function Board({ onFiles }: { onFiles: (files: FileList) => void }) {
     setDraft(null);
     if (cancelled || !g) return;
     const s = viewRef.current.scale;
+    if (g.kind === 'tap' && tool === 'cutout') {
+      void cutoutAt(toWorld(g.at));
+      return;
+    }
     if (g.kind === 'tap' && tool === 'text') {
       set({ pending: { kind: 'text', at: toWorld(g.at), points: [toWorld(g.at)], value: '' } });
       return;
@@ -286,7 +292,12 @@ export function Board({ onFiles }: { onFiles: (files: FileList) => void }) {
       const [a, b] = d.points;
       if (Math.hypot(b[0] - a[0], b[1] - a[1]) * s < 12) return;
       if (tool === 'arrow') addMark({ type: 'arrow', points: round(d.points) });
-      else set({ pending: { kind: 'dimension', at: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], points: round(d.points), value: '' } });
+      else {
+        // With a scale set, the measured length is pre-filled; he can overwrite it.
+        const px = project?.scene.scale?.pxPerCm;
+        const value = px ? `≈ ${cmText(lengthPx(a, b) / px)}` : '';
+        set({ pending: { kind: 'dimension', at: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], points: round(d.points), value } });
+      }
     }
   };
   const onPointerUp = (e: KonvaEventObject<PointerEvent>) => {
@@ -304,6 +315,37 @@ export function Board({ onFiles }: { onFiles: (files: FileList) => void }) {
     if (evt.ctrlKey || evt.metaKey) zoomAt(local(evt), viewRef.current.scale * Math.exp(-evt.deltaY * 0.01));
     else setView((v) => ({ ...v, x: v.x - evt.deltaX, y: v.y - evt.deltaY }));
   };
+
+  /** Tap a piece of equipment: the photo goes out with a red dot on it and comes back as a transparent part. */
+  async function cutoutAt([x, y]: [number, number]) {
+    if (!baseImg || get().busy) return;
+    const lang = get().lang;
+    const [AW, AH] = apiSize(W, H);
+    const c = draw(baseImg, AW, AH);
+    const ctx = c.getContext('2d')!;
+    const r = Math.min(AW, AH) * 0.014;
+    ctx.beginPath();
+    ctx.arc((x / W) * AW, (y / H) * AH, r, 0, Math.PI * 2);
+    ctx.fillStyle = RED;
+    ctx.fill();
+    ctx.lineWidth = r * 0.35;
+    ctx.strokeStyle = '#fff';
+    ctx.stroke();
+    set({ busy: { stage: 'rendering', text: tr(lang, 'cutting') } });
+    try {
+      const { b64 } = await api.post<{ b64: string }>('/api/cutout', { image: c.toDataURL('image/png'), size: `${AW}x${AH}` });
+      const img = draw(await loadImage(`data:image/png;base64,${b64}`), AW, AH);
+      const box = alphaBounds(pixels(img), AW, AH);
+      if (!box) throw new Error('Nothing was cut out — try tapping the middle of the equipment.');
+      const out = canvas(box.x1 - box.x0, box.y1 - box.y0);
+      out.getContext('2d')!.drawImage(img, -box.x0, -box.y0);
+      set({ busy: null, pending: { kind: 'part', at: [x, y], points: [], value: '', cut: out.toDataURL('image/png') } });
+    } catch (e) {
+      set({ busy: null });
+      if ((e as Error).message === 'demo') set({ tool: 'lasso', hint: tr(lang, 'demoCut') });
+      else toast((e as Error).message);
+    }
+  }
 
   async function cutPart(points: [number, number][]) {
     if (!baseImg) return;
@@ -503,6 +545,20 @@ function PendingInput({ view }: { view: View }) {
   const [value, setValue] = useState(pending.kind === 'part' ? '' : pending.value);
   const left = pending.at[0] * view.scale + view.x, top = pending.at[1] * view.scale + view.y;
   const label = pending.kind === 'dimension' ? tr(lang, 'valueDim') : pending.kind === 'text' ? tr(lang, 'valueNote') : tr(lang, 'partName');
+  const cm = pending.kind === 'dimension' ? parseCm(value) : null;
+  /** This dimension becomes the photo's scale; elements of known size snap to real size. */
+  const setScale = () => {
+    const v = value.trim();
+    set({ pending: null });
+    if (!cm) return;
+    const pxPerCm = lengthPx(pending.points[0], pending.points[1]) / cm;
+    editScene((s) => ({
+      scale: { pxPerCm },
+      marks: [...s.marks, { uid: uid(), type: 'dimension', points: pending.points, text: v }],
+      elements: s.elements.map((e) => (e.sizeCm ? { ...e, w: e.sizeCm[0] * pxPerCm, h: (e.sizeCm[0] * pxPerCm * e.h) / e.w } : e)),
+    }));
+    toast(tr(lang, 'scaleSet'));
+  };
   const commit = async () => {
     const v = value.trim();
     set({ pending: null });
@@ -522,6 +578,9 @@ function PendingInput({ view }: { view: View }) {
     <form className="pending" style={{ left, top }} onSubmit={(e) => { e.preventDefault(); void commit(); }}>
       <input autoFocus value={value} dir="auto" placeholder={label} aria-label={label} onChange={(e) => setValue(e.target.value)} onKeyDown={(e) => e.key === 'Escape' && set({ pending: null })} />
       <button type="submit" className="btn primary sm">{tr(lang, 'save')}</button>
+      {pending.kind === 'dimension' && (
+        <button type="button" className="btn sm" disabled={!cm} title={tr(lang, 'setScaleTip')} onClick={setScale}>{tr(lang, 'setScale')}</button>
+      )}
       <button type="button" className="btn ghost sm" onClick={() => set({ pending: null })}>{tr(lang, 'cancel')}</button>
     </form>
   );

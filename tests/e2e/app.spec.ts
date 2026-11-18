@@ -125,7 +125,7 @@ test('export: PNG and PowerPoint pitch slide download', async ({ page }) => {
   await dialog.getByRole('button', { name: 'Draft with Claude' }).click();
   await expect(dialog.getByRole('textbox').nth(1)).not.toHaveValue('');
   const pptx = page.waitForEvent('download');
-  await dialog.getByRole('button', { name: 'Download .pptx' }).click();
+  await dialog.getByRole('button', { name: 'Download .pptx', exact: true }).click();
   expect((await pptx).suggestedFilename()).toMatch(/\.pptx$/);
   expect(errors).toEqual([]);
 });

@@ -3,7 +3,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import path from 'node:path';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { z } from 'zod';
-import { CheckRequest, Memory, PitchRequest, Plan, Project, RenderRequest, TurnRequest, BRAND } from '../shared/types.ts';
+import { CheckRequest, CutoutRequest, EmailRequest, Memory, PitchRequest, Plan, Project, RenderRequest, TurnRequest, BRAND } from '../shared/types.ts';
 import { compilePrompt } from './compile.ts';
 import * as store from './store.ts';
 import * as mock from './mock.ts';
@@ -151,7 +151,21 @@ app.post('/api/pitch', rate, json, async (req, res) => {
   res.json(claude ? await claude.draftPitch(p.lang, p.history, p.before, p.after) : mock.mockPitch(p.lang, p.history));
 });
 
-app.get('/api/parts', (_req, res) => res.json(store.getParts()));
+app.post('/api/email', rate, json, async (req, res) => {
+  const e = body(EmailRequest, req);
+  spend('claude');
+  res.json(claude ? await claude.draftEmail(e.lang, e.pitches) : mock.mockEmail(e.lang, e.pitches));
+});
+
+// One piece of equipment, marked by a red dot, cut out onto a transparent background.
+app.post('/api/cutout', rate, json, async (req, res) => {
+  const c = body(CutoutRequest, req);
+  if (!images) return res.status(409).json({ error: 'demo' }); // demo mode: the client falls back to the lasso
+  spend('images');
+  res.json({ b64: await images.cutout(c.image, c.size) });
+});
+
+app.get('/api/parts',(_req, res) => res.json(store.getParts()));
 app.post('/api/parts', json, (req, res) => {
   store.addPart(body(z.object({ file: z.string(), name: z.string().min(1).max(60) }), req));
   res.json({ ok: true });

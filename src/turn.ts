@@ -135,7 +135,16 @@ async function render(sentence: string, plan: Plan, lang: Lang, scene: Scene, ou
   const v: Version = { id: uid(), file, note: sentence.slice(0, 140), parent, at: Date.now() };
   // What was rendered is now part of the picture; dimensions, notes and anything not in the plan's scene stay.
   const used = new Set([...scene.elements.map((e) => e.uid), ...scene.marks.filter((m) => m.type !== 'dimension' && m.type !== 'text').map((m) => m.uid)]);
-  edit((p) => ({ versions: [...p.versions, v], current: v.id, scene: { elements: p.scene.elements.filter((e) => !used.has(e.uid)), marks: p.scene.marks.filter((m) => !used.has(m.uid)) } }));
+  // A local edit keeps the camera, so the scale still holds; a whole new view/render does not.
+  const keepScale = !!masks;
+  edit((p) => ({
+    versions: [...p.versions, v], current: v.id,
+    scene: {
+      elements: p.scene.elements.filter((e) => !used.has(e.uid)),
+      marks: p.scene.marks.filter((m) => !used.has(m.uid)),
+      ...(keepScale && p.scene.scale ? { scale: p.scene.scale } : {}),
+    },
+  }));
   set({ tool: 'select' }); // the marks are spent; back to moving things, not drawing
   void check(sentence, plan, forClaude(baseC), forClaude(final), lang, out);
 }

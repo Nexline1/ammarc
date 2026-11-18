@@ -3,7 +3,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { betaZodOutputFormat } from '@anthropic-ai/sdk/helpers/beta/zod';
 import type { z } from 'zod';
-import { Check, Pitch, Plan, type Memory, type Scene, type TurnRequest } from '../shared/types.ts';
+import { Check, Email, Pitch, Plan, type Memory, type Scene, type TurnRequest } from '../shared/types.ts';
 
 const MODEL = process.env.CLAUDE_MODEL || 'claude-opus-5-5';
 const CHECK_MODEL = process.env.CHECK_MODEL || 'claude-haiku-5-5';
@@ -40,6 +40,7 @@ Deciding the plan
 - preserve: 3–8 specific visible things next to the region that a careless edit would disturb (e.g. "yellow handrail on the left", "gas hose under the burner ramp", "grating on the platform"). Look at the image.
 - style: "photo" when editing a real photo; "3d_render" when he says 3D or render, or the base is a blank board with elements; "drawing" when he asks for a drawing or diagram. If his rules say no colour for a proposal, honour it.
 - reply: 1–2 short sentences in HIS language (Arabic if he wrote Arabic) saying what you are doing in his terms. No pleasantries, no process talk.
+- Views: "side view", "inside / cutaway view", "exploded view" and "3D render" are whole-image requests (action "generate", region "whole"). Keep every object, its geometry and the proposed change; only the viewpoint or the presentation changes. Cutaway: open the casing to show plausible internal construction without inventing specifications. Exploded: separate the main parts along their assembly axes. Use style "drawing" for side/cutaway/exploded unless he asks for a render.
 - Never claim safety compliance, load ratings or engineering approval.`;
 
 export function memoryText(m: Memory): string {
@@ -53,6 +54,7 @@ const pct = (v: number, of: number) => `${Math.round((v / of) * 1000) / 10}%`;
 
 export function describeScene(scene: Scene, w: number, h: number): string {
   const lines = [`Image: ${w}×${h}px`];
+  if (scene.scale) lines.push(`Scale he set from a known dimension: about ${scene.scale.pxPerCm.toFixed(2)} px per cm near that spot (approximate; perspective applies). Use it to keep new objects to their real size.`);
   scene.elements.forEach((e, i) => {
     lines.push(`E${i + 1}: ${e.name} (${e.prompt}); centre ${pct(e.x, w)} across, ${pct(e.y, h)} down; size ${pct(e.w, w)}×${pct(e.h, h)}; rotation ${Math.round(e.rotation)}°` +
       (e.hinge ? `; hinge ${e.hinge}` : '') + (e.sizeCm ? `; size ${e.sizeCm[0]}×${e.sizeCm[1]} cm` : ''));
@@ -116,6 +118,12 @@ export async function checkResult(sentence: string, plan: Plan, before: string, 
     imageBlock(before), imageBlock(after),
     { type: 'text', text: `Request: ${sentence}\nPlan: ${plan.change}\nHinge/orientation: ${plan.items.map((i) => i.orientation).filter(Boolean).join('; ') || 'n/a'}` },
   ], 'low'));
+}
+
+export async function draftEmail(lang: 'en' | 'ar', pitches: Pitch[]): Promise<Email> {
+  const system = `You write a short, plain email from an engineer at an aluminium smelter to his supervisor, proposing the plant improvement(s) below. Subject max 10 words. Body: a one-line greeting, one or two sentences per proposal (hazard, why it matters, the proposed solution), a line saying concept images and a slide are attached, and a polite closing asking for a short meeting or site visit. No invented figures, standards, costs or approvals. Write it in ${lang === 'ar' ? 'formal Gulf-workplace Arabic' : 'English'}. Leave the signature as just "Ammar".`;
+  const list = pitches.map((p, i) => `${i + 1}. ${p.title}\nHazard: ${p.hazard}\nConsequence: ${p.consequence}\nSolution: ${p.solution}`).join('\n\n');
+  return Email.parse(await ask(MODEL, Email, system, [{ type: 'text', text: list }], 'low'));
 }
 
 export async function draftPitch(lang: 'en' | 'ar', history: { role: string; text: string }[], before: string | null, after: string | null): Promise<Pitch> {

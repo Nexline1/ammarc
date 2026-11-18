@@ -3,6 +3,7 @@ import type { Version } from '../shared/types.ts';
 import { upload } from './api.ts';
 import { board, loadCached } from './canvas/Board.tsx';
 import { ASPECTS, blankBoard, normalizeFile, type Aspect } from './canvas/raster.ts';
+import { realSize } from './canvas/scale.ts';
 import { elementUrl, type CatalogItem } from './elements/catalog.ts';
 import { tr } from './i18n.ts';
 import { addElement, edit, get, newProject, openProject, set, toast, uid, type Part } from './store.ts';
@@ -49,8 +50,14 @@ async function place(url: string, at: [number, number] | null, fields: { kind: '
   const { w, h } = api.size()!;
   const img = await loadCached(url);
   const short = Math.min(w, h);
-  let ew = short * 0.28, eh = (ew * img.naturalHeight) / img.naturalWidth;
-  if (eh > short * 0.5) { ew *= (short * 0.5) / eh; eh = short * 0.5; }
+  const aspect = img.naturalWidth / img.naturalHeight;
+  const scale = get().project?.scene.scale;
+  let ew: number, eh: number;
+  if (scale && fields.sizeCm) [ew, eh] = realSize(fields.sizeCm[0], scale.pxPerCm, aspect, short); // true to the scale he set
+  else {
+    ew = short * 0.28; eh = ew / aspect;
+    if (eh > short * 0.5) { ew *= (short * 0.5) / eh; eh = short * 0.5; }
+  }
   const [x, y] = at ?? api.center();
   addElement({ ...fields, url, x, y, w: ew, h: eh, rotation: 0, flipX: false });
 }

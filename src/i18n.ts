@@ -28,6 +28,17 @@ const en = {
   stepRead: 'Reading', stepDraw: 'Drawing', stepSave: 'Saving',
   assistantSub: 'English · عربي · voice', ideas: 'Ideas', originalPhoto: 'Original photo', blankBoard: 'Blank board', current: 'Current',
   hidePanel: 'Hide panel', zoomLabel: 'Zoom — click to fit',
+  setScale: 'Set as scale', setScaleTip: 'Use this length as the photo\'s scale: dropped elements then appear at real size',
+  scaleSet: 'Scale set — elements now appear at real size (approximate).', scaleOn: 'Scale', scaleClear: 'Scale is set — click to remove it',
+  views: 'Show as', viewSide: 'Side view', viewCut: 'Cutaway', viewExploded: 'Exploded', view3d: '3D render',
+  sayViewSide: 'Show this as a side view', sayViewCut: 'Show an inside cutaway view of this', sayViewExploded: 'Show an exploded view of this', sayView3d: 'Make it a 3D render',
+  deck: 'Proposal deck (several ideas)', deckSub: 'One PowerPoint: cover, a slide per idea, and a summary table.', deckPick: 'Pick the ideas to include',
+  deckTitle: 'Improvement proposals', summary: 'Summary', idea: 'Idea', noPitch: 'No pitch yet — open the idea and draft one',
+  email: 'Email to supervisor', emailSub: 'A short email you can copy or open in your mail app.', draftEmail: 'Draft email',
+  subject: 'Subject', body: 'Message', copy: 'Copy', copied: 'Copied', openMail: 'Open in mail',
+  pdf: 'PDF', pdfSub: 'A printable page: before, after and the pitch. Choose "Save as PDF".', printPdf: 'Open printable page',
+  tapCut: 'Tap equipment to cut it out', tapCutSub: 'Tap one piece of equipment in your photo', hintCutout: 'Tap the equipment you want as a part',
+  cutout: 'Cut out', cutting: 'Cutting it out…', demoCut: 'Demo mode: draw around the part instead.',
 };
 type Dict = typeof en;
 
@@ -59,6 +70,17 @@ const ar: Dict = {
   stepRead: 'أقرأ', stepDraw: 'أرسم', stepSave: 'أحفظ',
   assistantSub: 'English · عربي · صوت', ideas: 'الأفكار', originalPhoto: 'الصورة الأصلية', blankBoard: 'لوحة فاضية', current: 'الحالية',
   hidePanel: 'إخفاء اللوحة', zoomLabel: 'التكبير — اضغط للملائمة',
+  setScale: 'اعتمده كمقياس', setScaleTip: 'استخدم هالطول كمقياس للصورة: العناصر تنحط بمقاسها الحقيقي',
+  scaleSet: 'تم ضبط المقياس — العناصر الحين بمقاسها الحقيقي (تقريبي).', scaleOn: 'المقياس', scaleClear: 'المقياس مضبوط — اضغط عشان تشيله',
+  views: 'اعرضها', viewSide: 'منظر جانبي', viewCut: 'مقطع داخلي', viewExploded: 'منظر مفكك', view3d: 'ثلاثي الأبعاد',
+  sayViewSide: 'اعرضها من الجنب', sayViewCut: 'اعرض مقطع داخلي لها', sayViewExploded: 'اعرضها مفككة', sayView3d: 'خلها 3D',
+  deck: 'عرض مقترحات (أكثر من فكرة)', deckSub: 'ملف PowerPoint واحد: غلاف، شريحة لكل فكرة، وجدول ملخص.', deckPick: 'اختار الأفكار',
+  deckTitle: 'مقترحات تحسين', summary: 'ملخص', idea: 'فكرة', noPitch: 'ما في شريحة للحين — افتح الفكرة واكتبها',
+  email: 'إيميل للمسؤول', emailSub: 'إيميل قصير تنسخه أو تفتحه في تطبيق البريد.', draftEmail: 'اكتب الإيميل',
+  subject: 'الموضوع', body: 'الرسالة', copy: 'نسخ', copied: 'تم النسخ', openMail: 'افتح في البريد',
+  pdf: 'PDF', pdfSub: 'صفحة للطباعة: قبل وبعد والشرح. اختار "حفظ كـ PDF".', printPdf: 'افتح صفحة الطباعة',
+  tapCut: 'اضغط على المعدة عشان تقصها', tapCutSub: 'اضغط على قطعة وحدة في صورتك', hintCutout: 'اضغط على المعدة اللي تبيها كقطعة',
+  cutout: 'قص', cutting: 'أقصها…', demoCut: 'وضع التجربة: ارسم حول القطعة بدالها.',
 };
 
 const dicts = { en, ar };

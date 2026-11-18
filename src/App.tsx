@@ -9,7 +9,7 @@ import { Agent, Composer, MemorySheet, toggleMic } from './panels/Agent.tsx';
 import { ExportSheet } from './panels/Export.tsx';
 import { Library } from './panels/Library.tsx';
 import { Compare, parentOf, Versions } from './panels/Versions.tsx';
-import { duplicate, edit, flip, get, newProject, openProject, redo, removeItem, set, setLang, undo, updateElement, useStore, type LeftTab, type ProjectSummary, type Sheet as SheetName, type State, type Tool } from './store.ts';
+import { duplicate, edit, editScene, flip, get, newProject, openProject, redo, removeItem, set, setLang, undo, updateElement, useStore, type LeftTab, type ProjectSummary, type Sheet as SheetName, type State, type Tool } from './store.ts';
 import { runTurn } from './turn.ts';
 import { Icon } from './ui/Icon.tsx';
 import { Sheet } from './ui/Sheet.tsx';
@@ -187,7 +187,7 @@ function ToolHint() {
   const t = useT();
   const tool = useStore((s) => s.tool);
   const busy = useStore((s) => s.busy);
-  const keys: Partial<Record<Tool, Key>> = { pen: 'hintPen', arrow: 'hintArrow', dimension: 'hintDimension', text: 'hintText', eraser: 'hintEraser', lasso: 'hintLasso' };
+  const keys: Partial<Record<Tool, Key>> = { pen: 'hintPen', arrow: 'hintArrow', dimension: 'hintDimension', text: 'hintText', eraser: 'hintEraser', lasso: 'hintLasso', cutout: 'hintCutout' };
   const k = keys[tool];
   if (!k || busy) return null;
   return <div className="tool-hint" role="status">{t(k)}</div>;
@@ -244,7 +244,13 @@ function Toolbar({ wide }: { wide: boolean }) {
         </button>
         {el.sizeCm && (
           <label className="tb-size" title={t('sizeCm')}>
-            <input type="number" inputMode="decimal" min={1} value={el.sizeCm[0]} aria-label={`${t('sizeCm')} W`} onChange={(e) => updateElement(el.uid, { sizeCm: [Number(e.target.value) || 0, el.sizeCm![1]] }, false)} />
+            <input type="number" inputMode="decimal" min={1} value={el.sizeCm[0]} aria-label={`${t('sizeCm')} W`} onChange={(e) => {
+              const cm = Number(e.target.value) || 0;
+              const px = project?.scene.scale?.pxPerCm;
+              // With a scale set, typing the real width resizes the element to match.
+              const resize = px && cm > 0 ? { w: cm * px, h: (cm * px * el.h) / el.w } : {};
+              updateElement(el.uid, { sizeCm: [cm, el.sizeCm![1]], ...resize }, false);
+            }} />
             ×
             <input type="number" inputMode="decimal" min={1} value={el.sizeCm[1]} aria-label={`${t('sizeCm')} H`} onChange={(e) => updateElement(el.uid, { sizeCm: [el.sizeCm![0], Number(e.target.value) || 0] }, false)} />
             <span>cm</span>
@@ -289,6 +295,7 @@ function BottomBar() {
   const future = useStore((s) => s.future);
   const compare = useStore((s) => s.compare);
   const zoom = useStore((s) => s.zoom);
+  const scale = useStore((s) => s.project?.scene.scale);
   const canCompare = !!(project && parentOf(project));
   return (
     <div className="bottombar" role="toolbar">
@@ -300,6 +307,11 @@ function BottomBar() {
       <button className="tb-btn icon" aria-label={t('zoomIn')} onClick={() => board.api?.zoom(1.25)}><Icon name="plus" /></button>
       <span className="tb-sep" />
       <button className={`tb-btn${compare ? ' on' : ''}`} disabled={!canCompare} aria-pressed={compare} onClick={() => set({ compare: !compare })}><Icon name="compare" />{t('compare')}</button>
+      {scale && (
+        <button className="tb-btn on" title={t('scaleClear')} onClick={() => editScene(() => ({ scale: undefined }))}>
+          <Icon name="dimension" />{t('scaleOn')}
+        </button>
+      )}
     </div>
   );
 }

@@ -33,7 +33,12 @@ export const Mark = z.object({
 });
 export type Mark = z.infer<typeof Mark>;
 
-export const Scene = z.object({ elements: z.array(SceneElement), marks: z.array(Mark) });
+export const Scene = z.object({
+  elements: z.array(SceneElement),
+  marks: z.array(Mark),
+  // Set from one dimension line on something of known size. Approximate: true near that plane only.
+  scale: z.object({ pxPerCm: z.number().positive() }).optional(),
+});
 export type Scene = z.infer<typeof Scene>;
 
 // ---------- Plan (Claude's structured reading of one sentence) ----------
@@ -99,6 +104,11 @@ export type RenderRequest = z.infer<typeof RenderRequest>;
 
 export const CheckRequest = z.object({ sentence: z.string().max(2000), plan: Plan, before: DataUrl, after: DataUrl, lang: Lang });
 export const PitchRequest = z.object({ lang: Lang, history: z.array(ChatLine).max(20), before: DataUrl.nullable(), after: DataUrl.nullable() });
+export const Email = z.object({ subject: z.string(), body: z.string() });
+export type Email = z.infer<typeof Email>;
+export const EmailRequest = z.object({ lang: Lang, pitches: z.array(Pitch).min(1).max(12) });
+// Photo with a red dot on the equipment to cut out, already at an API size.
+export const CutoutRequest = z.object({ image: DataUrl, size: z.string().regex(/^\d+x\d+$/) });
 
 // ---------- Memory (visible, editable) ----------
 export const Memory = z.object({
@@ -128,6 +138,7 @@ export const Project = z.object({
   current: z.string().nullable(),
   scene: Scene,
   messages: z.array(Message),
+  pitch: Pitch.optional(), // last drafted/edited pitch, reused by the proposal deck
 });
 export type Project = z.infer<typeof Project>;
 
