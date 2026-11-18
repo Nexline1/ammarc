@@ -9,7 +9,7 @@ import { api, fileUrl, upload } from '../api.ts';
 import { tr, useT } from '../i18n.ts';
 import { addMark, editScene, get, removeItem, set, toast, uid, updateElement, useStore, type Part } from '../store.ts';
 import { alphaBounds, apiSize, canvas, draw, loadImage, pixels } from './raster.ts';
-import { cmText, lengthPx, parseCm } from './scale.ts';
+import { cmText, lengthPx, parseCm, realSize } from './scale.ts';
 
 export const RED = '#E5262E';
 const DIM = '#2457A6';
@@ -318,7 +318,7 @@ export function Board({ onFiles }: { onFiles: (files: FileList) => void }) {
 
   /** Tap a piece of equipment: the photo goes out with a red dot on it and comes back as a transparent part. */
   async function cutoutAt([x, y]: [number, number]) {
-    if (!baseImg || get().busy) return;
+    if (!baseImg || get().busy || x < 0 || y < 0 || x > W || y > H) return; // a tap beside the photo must not cost a render
     const lang = get().lang;
     const [AW, AH] = apiSize(W, H);
     const c = draw(baseImg, AW, AH);
@@ -552,10 +552,16 @@ function PendingInput({ view }: { view: View }) {
     set({ pending: null });
     if (!cm) return;
     const pxPerCm = lengthPx(pending.points[0], pending.points[1]) / cm;
+    const size = board.api?.size();
+    const short = size ? Math.min(size.w, size.h) : Infinity;
     editScene((s) => ({
       scale: { pxPerCm },
       marks: [...s.marks, { uid: uid(), type: 'dimension', points: pending.points, text: v }],
-      elements: s.elements.map((e) => (e.sizeCm ? { ...e, w: e.sizeCm[0] * pxPerCm, h: (e.sizeCm[0] * pxPerCm * e.h) / e.w } : e)),
+      elements: s.elements.map((e) => {
+        if (!e.sizeCm) return e;
+        const [w, h] = realSize(e.sizeCm[0], pxPerCm, e.w / e.h, short);
+        return { ...e, w, h };
+      }),
     }));
     toast(tr(lang, 'scaleSet'));
   };

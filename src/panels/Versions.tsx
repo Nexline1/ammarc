@@ -33,7 +33,8 @@ export function Versions({ onPick }: { onPick?: () => void }) {
               className={on ? 'on' : ''}
               aria-current={on || undefined}
               disabled={busy}
-              onClick={() => { if (!on && !get().busy) edit(() => ({ current: v.id })); onPick?.(); }}
+              // A scale belongs to one camera view: another version may be a side view or a render.
+              onClick={() => { if (!on && !get().busy) edit((p) => ({ current: v.id, scene: { ...p.scene, scale: undefined } })); onPick?.(); }}
             >
               <img src={fileUrl(v.file)} alt="" loading="lazy" draggable={false} />
               <span className="v-meta">

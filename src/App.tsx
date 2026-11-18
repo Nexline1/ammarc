@@ -4,6 +4,7 @@ import { api, fileUrl, setAuthHandler } from './api.ts';
 import { startBlank, startFromFile } from './actions.ts';
 import { Board, board } from './canvas/Board.tsx';
 import { ASPECTS, type Aspect } from './canvas/raster.ts';
+import { realSize } from './canvas/scale.ts';
 import { tr, useT, type Key } from './i18n.ts';
 import { Agent, Composer, MemorySheet, toggleMic } from './panels/Agent.tsx';
 import { ExportSheet } from './panels/Export.tsx';
@@ -248,7 +249,8 @@ function Toolbar({ wide }: { wide: boolean }) {
               const cm = Number(e.target.value) || 0;
               const px = project?.scene.scale?.pxPerCm;
               // With a scale set, typing the real width resizes the element to match.
-              const resize = px && cm > 0 ? { w: cm * px, h: (cm * px * el.h) / el.w } : {};
+              const size = board.api?.size();
+              const resize = px && cm > 0 && size ? (([w, h]) => ({ w, h }))(realSize(cm, px, el.w / el.h, Math.min(size.w, size.h))) : {};
               updateElement(el.uid, { sizeCm: [cm, el.sizeCm![1]], ...resize }, false);
             }} />
             ×

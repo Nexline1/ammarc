@@ -34,13 +34,19 @@ function save(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }
 
-const pic = (c: HTMLCanvasElement): Pic => ({ url: c.toDataURL('image/png'), w: c.width, h: c.height });
-async function picOf(file: string): Promise<Pic> {
-  const img = await loadImage(fileUrl(file));
-  const c = canvas(img.naturalWidth, img.naturalHeight);
-  c.getContext('2d')!.drawImage(img, 0, 0);
-  return pic(c);
+/** Slide-sized JPEG (≤1600 px): full-res PNGs of many photos would blow up phone memory and the .pptx size. */
+function pic(src: HTMLCanvasElement | HTMLImageElement): Pic {
+  const w0 = src instanceof HTMLImageElement ? src.naturalWidth : src.width;
+  const h0 = src instanceof HTMLImageElement ? src.naturalHeight : src.height;
+  const s = Math.min(1, 1600 / Math.max(w0, h0));
+  const c = canvas(Math.round(w0 * s), Math.round(h0 * s));
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.drawImage(src, 0, 0, c.width, c.height);
+  return { url: c.toDataURL('image/jpeg', 0.85), w: c.width, h: c.height };
 }
+const picOf = async (file: string) => pic(await loadImage(fileUrl(file)));
 
 /** The open idea: after = the board with his dimension lines and notes. */
 async function liveIdea(project: Project, pitch: Pitch): Promise<Idea | null> {
@@ -106,15 +112,14 @@ async function buildDeck(ideas: Idea[], lang: Lang, name: string) {
       const head = ['#', tr(lang, 'idea'), tr(lang, 'hazard'), tr(lang, 'consequence'), tr(lang, 'solution')];
       const rows = slide.rows.map((r) => [String(r.n), r.title, r.pitch?.hazard || '—', r.pitch?.consequence || '—', r.pitch?.solution || '—']);
       const table = [head, ...rows].map((row) => (ar ? [...row].reverse() : row).map((text) => ({ text })));
-      s.addTable(table, { x: 0.6, y: 1.3, w: 12.13, colW: ar ? [3.2, 3, 3, 2.33, 0.6] : [0.6, 2.33, 3, 3, 3.2], fontFace: font, fontSize: 11, color: '16191D', border: { type: 'solid', pt: 0.75, color: 'E4E7EB' }, fill: { color: 'FFFFFF' }, align, valign: 'top' });
+      s.addTable(table, { x: 0.6, y: 1.3, w: 12.13, colW: ar ? [3.2, 3, 3, 2.33, 0.6] : [0.6, 2.33, 3, 3, 3.2], fontFace: font, fontSize: 11, color: '16191D', border: { type: 'solid', pt: 0.75, color: 'E4E7EB' }, fill: { color: 'FFFFFF' }, align, valign: 'top', autoPage: true, autoPageRepeatHeader: true, autoPageHeaderRows: 1 });
     }
   }
   await pres.writeFile({ fileName: `${fileName(name)}.pptx` });
 }
 
-function printPage(idea: Idea, lang: Lang) {
-  const w = window.open('', '_blank');
-  if (!w) { toast('Allow pop-ups to print.'); return; }
+/** `w` is opened synchronously in the tap handler: after any await, phones block the pop-up. */
+function printPage(w: Window, idea: Idea, lang: Lang) {
   const p = idea.pitch ?? EMPTY(idea.name);
   const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
   w.document.write(`<!doctype html><html lang="${lang}" dir="${lang === 'ar' ? 'rtl' : 'ltr'}"><head><meta charset="utf-8"><title>${esc(p.title || idea.name)}</title>
@@ -130,6 +135,13 @@ b{display:block;margin-bottom:4px}footer{margin-top:14px;color:#8e97a1;font-size
   w.document.close();
 }
 
+/** Mail apps cut off long links (~2 KB; Arabic grows 6× when encoded): then send the subject only and paste the body. */
+function mailto(e: Email) {
+  const subject = `mailto:?subject=${encodeURIComponent(e.subject)}`;
+  const full = `${subject}&body=${encodeURIComponent(e.body)}`;
+  return full.length <= 1800 ? full : subject;
+}
+
 export function ExportSheet() {
   const t = useT();
   const project = useStore((s) => s.project);
@@ -141,7 +153,7 @@ export function ExportSheet() {
   const [picked, setPicked] = useState<string[]>(project ? [project.id] : []);
   const [busy, setBusy] = useState<string | null>(null);
   const [email, setEmail] = useState<Email | null>(null);
-  useEffect(() => { void api.get<ProjectSummary[]>('/api/projects').then((all) => setIdeas(all.filter((p) => p.thumb))); }, []);
+  useEffect(() => { void api.get<ProjectSummary[]>('/api/projects').then((all) => setIdeas(all.filter((p) => p.thumb))).catch(() => undefined); }, []);
   if (!project?.current) return <p className="muted pad">{t('dropTitle')}</p>;
 
   // The pitch is kept with the idea, so the deck and email can reuse it later.
@@ -176,9 +188,13 @@ export function ExportSheet() {
   const draftEmail = run('email', async () => {
     const list = await pickedIdeas();
     const pitches = list.map((i) => i.pitch ?? EMPTY(i.name));
-    setEmail(await api.post<Email>('/api/email', { lang, pitches: pitches.length ? pitches : [pitch] }));
+    setEmail(await api.post<Email>('/api/email', { lang, pitches: (pitches.length ? pitches : [pitch]).slice(0, 12) }));
   });
-  const pdf = run('pdf', async () => { const i = await liveIdea(project, pitch); if (i) printPage(i, lang); });
+  const pdf = () => {
+    const w = window.open('', '_blank');
+    if (!w) { toast('Allow pop-ups to print.'); return; }
+    return run('pdf', async () => { const i = await liveIdea(project, pitch); if (i) printPage(w, i, lang); else w.close(); })();
+  };
 
   const field = (k: keyof Pitch, rows = 2) => (
     <label className="field">
@@ -243,7 +259,7 @@ export function ExportSheet() {
             <label className="field"><span>{t('body')}</span><textarea rows={8} dir="auto" value={email.body} onChange={(e) => setEmail({ ...email, body: e.target.value })} /></label>
             <div className="row">
               <button className="btn" onClick={() => void navigator.clipboard.writeText(`${email.subject}\n\n${email.body}`).then(() => toast(t('copied')))}><Icon name="copy" size={18} />{t('copy')}</button>
-              <a className="btn" href={`mailto:?subject=${encodeURIComponent(email.subject)}&body=${encodeURIComponent(email.body)}`}><Icon name="send" size={18} />{t('openMail')}</a>
+              <a className="btn" href={mailto(email)} onClick={() => mailto(email).includes('&body=') || toast(t('pasteBody'))}><Icon name="send" size={18} />{t('openMail')}</a>
             </div>
           </div>
         )}
