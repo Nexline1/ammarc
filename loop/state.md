@@ -44,6 +44,13 @@ After the fixes: tsc clean, 109/109 unit tests, e2e 8 passed with 2 skipped by d
 
 All checks green after this round: tsc, 109 unit tests, mock eval 8/8, e2e 8 passed with 2 skipped by design.
 
+## Round 3 (2026-11-18): "Deepen it for Ammar", merged to main (20e7af4) on 2026-11-18
+- **True-to-scale:** "Set as scale" on a dimension line. Elements then drop in at real size, dimensions pre-fill their length, and typing a width resizes. The scale is cleared on a version switch or a whole-image render.
+- **View chips:** side, cutaway, exploded and 3D, each as a new branched version.
+- **Proposal pack:** the pitch is saved per idea; a multi-idea deck; a supervisor email (EN/AR); a printable PDF.
+- **Tap equipment to cut it out** as a part (lasso in demo mode).
+- **Checks:** Opus review, with all 9 findings fixed. tsc clean, 131 unit tests, e2e 11 passed with 5 skipped by design.
+
 ## Next (after the owner adds keys)
 - `npm run eval -- --live --cap=5` with his photos in `evals/images/`
 - a manual real render on one photo
