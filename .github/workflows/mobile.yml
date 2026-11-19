@@ -7,6 +7,9 @@ on:
       url:
         description: 'Ammarc address baked into the release APK. Empty = the live Render site.'
         required: false
+      release:
+        description: 'Version to publish as a GitHub Release once the emulator test passes (e.g. 1.0.0). Empty = no release.'
+        required: false
 
 jobs:
   build:
@@ -72,3 +75,17 @@ jobs:
           path: |
             smoke/
             server.log
+
+  release:
+    if: github.event_name == 'workflow_dispatch' && inputs.release != ''
+    needs: emulator
+    runs-on: ubuntu-latest
+    permissions: { contents: write }
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: ammarc-apks, path: apk }
+      - name: Publish the tested APK
+        env: { GH_TOKEN: '${{ github.token }}', V: '${{ inputs.release }}' }
+        run: |
+          mv apk/app-release.apk "Ammarc-$V.apk"
+          gh release create "mobile-v$V" "Ammarc-$V.apk" --repo "${{ github.repository }}" --target "${{ github.sha }}"             --title "Ammarc for Android $V"             --notes "Install on an Android phone: download Ammarc-$V.apk, open it, and allow installing from that source once. Opens ${{ inputs.url || 'https://ammarc-d68t.onrender.com' }}. Built and smoke-tested on an Android 14 emulator in this run."
