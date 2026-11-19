@@ -71,6 +71,7 @@ function Login() {
         <label className="field"><span>{t('password')}</span><input type="password" autoFocus value={pw} onChange={(e) => { setPw(e.target.value); setErr(false); }} autoComplete="current-password" /></label>
         {err && <p className="error" role="alert">{t('wrong')}</p>}
         <button className="btn primary" type="submit">{t('signIn')}</button>
+        {!navigator.userAgent.includes('AmmarcApp') && <a className="get-app" href="/app">{t('getApp')}</a>}
       </form>
     </main>
   );

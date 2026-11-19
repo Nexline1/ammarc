@@ -7,6 +7,7 @@ import { CheckRequest, CutoutRequest, EmailRequest, Memory, PitchRequest, Plan, 
 import { compilePrompt } from './compile.ts';
 import * as store from './store.ts';
 import * as mock from './mock.ts';
+import { downloads } from './download.ts';
 
 const DEV = process.argv.includes('--dev');
 const PORT = Number(process.env.PORT || 5180);
@@ -62,6 +63,7 @@ app.post('/api/login', express.json(), async (req, res) => {
 app.get('/api/status', (req, res) => res.json({ mock: MOCK, auth: !!PASSWORD, authed: authed(req), brand: BRAND }));
 
 app.use(['/api', '/files'], (req, res, next) => (authed(req) ? next() : res.status(401).json({ error: 'Sign in first' })));
+downloads(app); // /app and /app/Ammarc.apk stay public: the phone app holds no secrets
 
 // ---------- Rate + spend guards ----------
 const hits: number[] = [];

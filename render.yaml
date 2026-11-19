@@ -24,6 +24,8 @@ services:
         sync: false
       - key: OPENAI_API_KEY
         sync: false
+      - key: GH_RELEASE_TOKEN   # read-only GitHub token so /app can hand out the Android APK from the private repo's Releases
+        sync: false
       - key: DAILY_IMAGE_CAP
         value: "60"
       - key: DAILY_CLAUDE_CAP

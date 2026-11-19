@@ -441,6 +441,7 @@ a.btn { text-decoration: none; }
 .login form { display: grid; gap: 14px; width: min(360px, 100%); padding: 28px; border-radius: var(--r-xl); background: var(--paper); box-shadow: var(--sh-3); }
 .login .wordmark { font-size: 22px; }
 .login p { margin: -6px 0 6px; }
+.login .get-app { justify-self: center; color: var(--cu-600); font-size: 14px; font-weight: 600; text-decoration: none; }
 
 /* ---------- accessibility preferences ---------- */
 @media (prefers-reduced-motion: reduce) {
