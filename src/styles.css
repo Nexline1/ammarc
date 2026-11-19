@@ -453,3 +453,97 @@ a.btn { text-decoration: none; }
 @media (prefers-contrast: more) {
   .toolbar, .bottombar, .tile, .chip, .btn { box-shadow: inset 0 0 0 1.5px var(--ink-700); }
 }
+
+/* ---------- Focus canvas (laptop ≥1200px) ----------
+   The photo is full-bleed. Chrome floats over it on glass, centred in the space the open panels leave free.
+   Motion uses the expo-out curve from Gent Station. */
+:root { --ease-out: cubic-bezier(.16, 1, .3, 1); --glass: rgba(255, 255, 255, .8); --hair: rgba(22, 25, 29, .08); }
+.glass, .wide .topbar .wordmark, .wide .project-name, .search-btn, .wide .topbar .lang, .wide .topbar .pill.demo,
+.wide .rail, .panel.float, .command-bar, .wide .toolbar, .wide .bottombar {
+  background: var(--glass); -webkit-backdrop-filter: blur(22px) saturate(175%); backdrop-filter: blur(22px) saturate(175%);
+  box-shadow: 0 0 0 1px var(--hair), 0 1px 2px rgba(22, 25, 29, .05), 0 10px 30px rgba(42, 47, 54, .10);
+}
+.app.wide { grid-template-rows: 1fr; }
+.wide .workspace { grid-template-columns: 1fr; }
+.wide .stage-area { --cx: calc(var(--inset-l, 0px) + (100% - var(--inset-l, 0px) - var(--inset-r, 0px)) / 2); }
+
+/* Top: floating pills instead of a bar */
+.wide .topbar { position: absolute; inset: 12px 12px auto; z-index: 8; height: 44px; padding: 0; gap: 8px; background: transparent; border: 0; pointer-events: none; }
+.wide .topbar > * { pointer-events: auto; }
+.wide .topbar .wordmark { height: 44px; padding: 0 14px 0 10px; border-radius: 14px; }
+.wide .project-name { height: 44px; padding: 0 10px 0 14px; border-radius: 14px; color: var(--ink-800); }
+.wide .topbar .lang, .wide .topbar .pill.demo { height: 36px; border-radius: 12px; }
+.wide .topbar .btn.primary { height: 44px; border-radius: 14px; padding: 0 18px; }
+.search-btn {
+  display: inline-flex; align-items: center; gap: 8px; height: 44px; min-width: 190px; padding: 0 8px 0 14px; border-radius: 14px;
+  color: var(--ink-500); font-size: 13px; transition: transform .2s var(--ease-out);
+}
+.search-btn:hover { color: var(--ink-800); }
+.search-btn:active { transform: scale(.98); }
+.search-btn kbd, .palette-input kbd {
+  margin-inline-start: auto; padding: 2px 7px; border-radius: 6px; font: 600 11px/1.4 var(--font-ui); color: var(--ink-500);
+  background: rgba(22, 25, 29, .05); box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+/* Left: a slim floating rail + the panel it opens */
+.wide .rail { position: absolute; z-index: 6; left: 12px; top: 68px; width: 64px; padding: 6px; gap: 2px; border: 0; border-radius: 18px; }
+.wide .rail-btn { padding: 9px 2px 7px; border-radius: 13px; font-size: 10.5px; }
+.panel.float {
+  position: absolute; z-index: 6; top: 68px; bottom: 16px; border: 0 !important; border-radius: 20px; overflow: hidden;
+  background: rgba(255, 255, 255, .88); animation: float-in .5s var(--ease-out) both;
+}
+.panel.left.float { left: 84px; width: 308px; --from: -14px; }
+.panel.right.float { right: 12px; width: 348px; --from: 14px; }
+@keyframes float-in { from { opacity: 0; transform: translateX(var(--from)) scale(.985); } }
+.panel.float .panel-head { border-bottom-color: var(--hair); }
+.panel.float .tile, .panel.float .version-list button, .panel.float .action-card, .panel.float .example { background: rgba(255, 255, 255, .7); }
+
+/* Bottom: the command bar, with the tool pill above it */
+.command-bar {
+  position: absolute; z-index: 7; bottom: 16px; left: var(--cx); transform: translateX(-50%);
+  width: min(680px, calc(100% - var(--inset-l, 0px) - var(--inset-r, 0px) - 32px)); min-width: 380px;
+  display: flex; align-items: flex-end; gap: 6px; padding: 8px; border-radius: 22px;
+  animation: rise-in .55s var(--ease-out) both;
+}
+@keyframes rise-in { from { opacity: 0; transform: translate(-50%, 14px); } }
+.command-main { flex: 1; min-width: 0; display: grid; }
+.command-main .view-chips { border: 0; padding: 2px 2px 8px; }
+.command-main .composer { border: 0; padding: 0; background: transparent; }
+.command-main .composer textarea { background: rgba(255, 255, 255, .7); }
+.thread-toggle { position: relative; width: 42px; height: 42px; border-radius: 14px; flex: none; }
+.thread-toggle.on { background: var(--cu-50); color: var(--cu-600); box-shadow: inset 0 0 0 1px var(--cu-200); }
+.thread-toggle .dot { position: absolute; top: 9px; right: 9px; width: 8px; height: 8px; border-radius: 50%; background: var(--cu-500); box-shadow: 0 0 0 2px var(--paper); }
+.wide .toolbar { top: auto; bottom: 150px; left: var(--cx); border-radius: 16px; }
+.wide .bottombar { top: 12px; bottom: auto; left: var(--cx); height: 44px; padding: 4px; border-radius: 14px; }
+.wide .bottombar .tb-btn { height: 36px; }
+.wide .tool-hint, .wide .hint { top: auto; bottom: 206px; left: var(--cx); }
+.wide .last-reply { left: auto; right: 12px; bottom: 16px; width: 340px; animation: float-in .45s var(--ease-out) both; --from: 14px; }
+.wide .empty { padding-left: calc(var(--inset-l, 0px) + 24px); padding-right: calc(var(--inset-r, 0px) + 24px); }
+.wide .compare { z-index: 9; } /* above the floating chrome: it is a full-screen moment with its own Close */
+.wide .board-busy { padding-top: 70px; padding-left: var(--inset-l, 0px); padding-right: var(--inset-r, 0px); }
+
+/* Cmd/Ctrl+K palette */
+.palette-scrim { position: fixed; inset: 0; z-index: 70; display: flex; justify-content: center; align-items: flex-start; padding: 12vh 16px 16px; background: rgba(22, 25, 29, .28); animation: fade-in .2s ease both; }
+@keyframes fade-in { from { opacity: 0; } }
+.palette {
+  width: min(620px, 100%); max-height: 70vh; display: flex; flex-direction: column; overflow: hidden; border-radius: 20px;
+  background: rgba(255, 255, 255, .92); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 0 0 1px var(--hair), 0 24px 80px rgba(22, 25, 29, .28); animation: pop-in .35s var(--ease-out) both;
+}
+@keyframes pop-in { from { opacity: 0; transform: translateY(-8px) scale(.98); } }
+.palette-input { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--hair); color: var(--ink-400); }
+.palette-input input { border: 0; box-shadow: none !important; padding: 4px 0; font-size: 16px; background: transparent; color: var(--ink-900); }
+.palette-list { list-style: none; margin: 0; padding: 6px; overflow-y: auto; }
+.palette-group { padding: 10px 10px 4px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-400); }
+html[lang="ar"] .palette-group { letter-spacing: 0; text-transform: none; }
+.palette-list button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 12px; text-align: start; color: var(--ink-800); }
+.palette-list button.on { background: var(--cu-50); box-shadow: inset 0 0 0 1px var(--cu-200); }
+.palette-list img { width: 34px; height: 34px; object-fit: contain; flex: none; }
+.palette-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: rgba(22, 25, 29, .05); color: var(--ink-600); flex: none; }
+.palette-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+.palette-hint { font-size: 12px; color: var(--ink-400); }
+.palette-empty { padding: 24px; text-align: center; color: var(--ink-500); }
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass, .wide .topbar .wordmark, .wide .project-name, .search-btn, .wide .rail, .panel.float, .command-bar, .palette { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}

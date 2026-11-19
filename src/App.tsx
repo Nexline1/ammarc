@@ -13,6 +13,7 @@ import { Compare, parentOf, Versions } from './panels/Versions.tsx';
 import { duplicate, edit, editScene, flip, get, newProject, openProject, redo, removeItem, set, setLang, undo, updateElement, useStore, type LeftTab, type ProjectSummary, type Sheet as SheetName, type State, type Tool } from './store.ts';
 import { runTurn } from './turn.ts';
 import { Icon } from './ui/Icon.tsx';
+import { CommandPalette } from './ui/CommandPalette.tsx';
 import { Sheet } from './ui/Sheet.tsx';
 
 // Three panels need room for the board; below this the board goes full-screen with sheets (phones, tablets).
@@ -85,8 +86,11 @@ function Studio() {
   const status = useStore((s) => s.status);
   const dragging = useStore((s) => s.dragging);
   const left = useStore((s) => s.left);
+  const thread = useStore((s) => s.thread);
+  const palette = useStore((s) => s.palette);
   const fileInput = useRef<HTMLInputElement>(null);
   const hasImage = !!project?.current;
+  const insets = wide ? { l: left ? 404 : 84, r: thread ? 372 : 24, t: 72, b: 212 } : undefined;
 
   useShortcuts();
   useAwaitingTap();
@@ -109,6 +113,11 @@ function Studio() {
         <button className="project-name" onClick={() => set(wide ? { left: 'ideas' } : { sheet: 'projects' })} title={t('projects')}>
           <span dir="auto">{project?.name ?? '…'}</span><Icon name="chevron" size={16} />
         </button>
+        {wide && (
+          <button className="search-btn" onClick={() => set({ palette: true })} aria-label={t('searchAll')}>
+            <Icon name="search" size={16} /><span>{t('searchAll')}</span><kbd>{/Mac/.test(navigator.platform) ? '⌘K' : 'Ctrl K'}</kbd>
+          </button>
+        )}
         <div className="spacer" />
         {status?.mock && <span className="pill demo" title={t('demoTip')}>{t('demo')}</span>}
         <button className="btn ghost sm lang" onClick={() => setLang(get().lang === 'en' ? 'ar' : 'en')} aria-label={t('language')}>
@@ -117,29 +126,33 @@ function Studio() {
         {wide && <button className="btn primary" disabled={!hasImage} onClick={() => set({ sheet: 'export' })}><Icon name="export" size={18} />{t('export')}</button>}
       </header>
 
-      <main className={`workspace${wide && !left ? ' collapsed' : ''}`}>
-        {wide && <Rail />}
-        {wide && left && (
-          <aside className="panel left" aria-label={t(RAIL.find((r) => r.id === left)!.label)}>
-            {left === 'elements' && <Library compact={false} tab="elements" />}
-            {left === 'parts' && <Library compact={false} tab="parts" />}
-            {left === 'versions' && <div className="panel-scroll"><h2 className="panel-title">{t('versions')}</h2><Versions /></div>}
-            {left === 'ideas' && <div className="panel-scroll"><h2 className="panel-title">{t('ideas')}</h2><Projects /></div>}
-          </aside>
-        )}
-        <section className="stage-area" aria-label="Board">
-          <Board onFiles={onFiles} />
+      <main className="workspace">
+        <section className="stage-area" aria-label="Board" style={insets ? ({ '--inset-l': `${insets.l}px`, '--inset-r': `${insets.r}px` } as React.CSSProperties) : undefined}>
+          {/* Focus canvas: the photo is full-bleed; on a laptop everything else floats over it and the fit leaves room for it. */}
+          <Board onFiles={onFiles} insets={insets} />
           {project && !project.versions.length && <EmptyState onPick={() => fileInput.current?.click()} />}
           {hasImage && <Toolbar wide={wide} />}
           {hasImage && wide && <BottomBar />}
           {hint
             ? <div className="hint" role="status">{hint}<button className="icon-btn sm" aria-label={t('close')} onClick={() => set({ hint: null, awaiting: null, tool: 'select' })}><Icon name="close" size={14} /></button></div>
             : hasImage && <ToolHint />}
+          {wide && <Rail />}
+          {wide && left && (
+            <aside key={left} className="panel left float" aria-label={t(RAIL.find((r) => r.id === left)!.label)}>
+              {left === 'elements' && <Library compact={false} tab="elements" />}
+              {left === 'parts' && <Library compact={false} tab="parts" />}
+              {left === 'versions' && <div className="panel-scroll"><h2 className="panel-title">{t('versions')}</h2><Versions /></div>}
+              {left === 'ideas' && <div className="panel-scroll"><h2 className="panel-title">{t('ideas')}</h2><Projects /></div>}
+            </aside>
+          )}
+          {wide && thread && <aside className="panel right float" aria-label={t('assistant')}><Agent compact={false} /></aside>}
+          {wide && <CommandBar />}
           {compare && <Compare />}
           {!wide && <LastReply />}
+          {wide && !thread && <LastReply />}
         </section>
-        {wide && <aside className="panel right" aria-label={t('assistant')}><Agent compact={false} /></aside>}
       </main>
+      {palette && <CommandPalette onPhoto={() => fileInput.current?.click()} />}
 
       {!wide && <Dock />}
       <input ref={fileInput} type="file" accept="image/*" hidden onChange={(e) => { if (e.target.files) onFiles(e.target.files); e.target.value = ''; }} />
@@ -180,6 +193,21 @@ function Rail() {
         </button>
       ))}
     </nav>
+  );
+}
+
+/** Laptop: one place to type or talk, centred under the photo; the assistant thread folds away beside it. */
+function CommandBar() {
+  const t = useT();
+  const thread = useStore((s) => s.thread);
+  const count = useStore((s) => s.project?.messages.length ?? 0);
+  return (
+    <div className="command-bar">
+      <button className={`icon-btn thread-toggle${thread ? ' on' : ''}`} aria-pressed={thread} title={t('assistant')} aria-label={t('assistant')} onClick={() => set({ thread: !thread })}>
+        <Icon name="chat" />{count > 0 && !thread && <b className="dot" aria-hidden="true" />}
+      </button>
+      <div className="command-main"><Composer /></div>
+    </div>
   );
 }
 
@@ -350,7 +378,7 @@ function LastReply() {
   const last = messages?.[messages.length - 1];
   if (!busy && (!last || last.role !== 'agent')) return null;
   return (
-    <button className="last-reply" onClick={() => set({ sheet: 'chat' })}>
+    <button className="last-reply" onClick={() => set(mq.matches ? { thread: true } : { sheet: 'chat' })}>
       {busy ? <><span className="dots" aria-hidden="true"><i /><i /><i /></span>{busy.text}</> : <span dir="auto">{last!.text}</span>}
     </button>
   );
@@ -388,9 +416,10 @@ function Projects() {
 function useShortcuts() {
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
-      if ((e.target as HTMLElement).closest('input, textarea, [contenteditable]')) return;
       const s = get();
       const mod = e.ctrlKey || e.metaKey;
+      if (mod && e.key.toLowerCase() === 'k') { e.preventDefault(); set({ palette: !s.palette }); return; }
+      if ((e.target as HTMLElement).closest('input, textarea, [contenteditable]')) return;
       if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) redo(); else undo(); return; }
       if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return; }
       if (mod && e.key.toLowerCase() === 'd' && s.selected) { e.preventDefault(); duplicate(s.selected); return; }

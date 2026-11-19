@@ -34,6 +34,8 @@ export type State = {
   dragging: boolean; // a library tile is being dragged (the phone sheet hides but stays mounted)
   left: LeftTab | null; // laptop rail: which panel is open (null = collapsed, more room for the photo)
   zoom: number; // board zoom, 1 = 100 %
+  thread: boolean; // laptop: assistant thread card shown
+  palette: boolean; // Cmd/Ctrl+K command palette open
 };
 
 const savedLang = (() => { try { return localStorage.getItem('arm-lang') as Lang | null; } catch { return null; } })();
@@ -42,7 +44,7 @@ let state: State = {
   status: null, project: null, projects: [], parts: [], memory: null,
   tool: 'select', selected: null, lang: savedLang === 'ar' ? 'ar' : 'en',
   busy: null, preview: null, compare: false, past: [], future: [], sheet: null,
-  draft: '', toast: null, pending: null, hint: null, awaiting: null, dragging: false, left: 'elements', zoom: 1,
+  draft: '', toast: null, pending: null, hint: null, awaiting: null, dragging: false, left: 'elements', zoom: 1, thread: true, palette: false,
 };
 const listeners = new Set<() => void>();
 const subscribe = (l: () => void) => { listeners.add(l); return () => listeners.delete(l); };

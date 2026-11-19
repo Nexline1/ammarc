@@ -39,7 +39,7 @@ async function send(page: Page, text: string) {
     await page.getByRole('dialog').getByRole('textbox').fill(text);
     await page.getByRole('dialog').getByRole('button', { name: 'Send' }).click();
   } else {
-    await page.locator('.panel.right').getByRole('textbox').fill(text);
+    await page.locator('.command-bar').getByRole('textbox').fill(text);
     await page.keyboard.press('Enter');
   }
 }

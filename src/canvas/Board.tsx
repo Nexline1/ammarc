@@ -68,7 +68,9 @@ type Gesture =
   | { kind: 'tap'; at: P };
 type View = { scale: number; x: number; y: number };
 
-export function Board({ onFiles }: { onFiles: (files: FileList) => void }) {
+type Insets = { l: number; r: number; t: number; b: number };
+/** `insets` = room taken by floating panels; the photo fits in what's left (and re-centres when a panel opens or closes). */
+export function Board({ onFiles, insets }: { onFiles: (files: FileList) => void; insets?: Insets }) {
   const t = useT();
   const project = useStore((s) => s.project);
   const tool = useStore((s) => s.tool);
@@ -97,7 +99,10 @@ export function Board({ onFiles }: { onFiles: (files: FileList) => void }) {
   const previewImg = useImage(preview);
   const W = baseImg?.naturalWidth ?? 0, H = baseImg?.naturalHeight ?? 0;
   const short = Math.min(W, H) || 1000;
-  const fitScale = W && box.w ? Math.min((box.w - (box.w < 600 ? 24 : 96)) / W, (box.h - (box.w < 600 ? 24 : 96)) / H) : 1;
+  const ins = insets ?? { l: 12, r: 12, t: 12, b: 12 };
+  const pad = box.w < 600 ? 0 : 24;
+  const room = { w: Math.max(200, box.w - ins.l - ins.r - pad * 2), h: Math.max(200, box.h - ins.t - ins.b - pad * 2) };
+  const fitScale = W && box.w ? Math.min(room.w / W, room.h / H) : 1;
 
   useLayoutEffect(() => {
     const el = wrapRef.current!;
@@ -110,8 +115,8 @@ export function Board({ onFiles }: { onFiles: (files: FileList) => void }) {
 
   const fit = useCallback(() => {
     if (!W || !box.w) return;
-    setView({ scale: fitScale, x: (box.w - W * fitScale) / 2, y: (box.h - H * fitScale) / 2 });
-  }, [W, H, box.w, box.h, fitScale]);
+    setView({ scale: fitScale, x: ins.l + pad + (room.w - W * fitScale) / 2, y: ins.t + pad + (room.h - H * fitScale) / 2 });
+  }, [W, H, box.w, box.h, fitScale, ins.l, ins.t, pad, room.w, room.h]);
   useEffect(fit, [fit]);
 
   const toWorld = (p: P): [number, number] => {

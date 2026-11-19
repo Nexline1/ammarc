@@ -38,6 +38,8 @@ const en = {
   subject: 'Subject', body: 'Message', copy: 'Copy', copied: 'Copied', pasteBody: 'The message is long: press Copy, then paste it into the email.', openMail: 'Open in mail',
   pdf: 'PDF', pdfSub: 'A printable page: before, after and the pitch. Choose "Save as PDF".', printPdf: 'Open printable page',
   tapCut: 'Tap equipment to cut it out', tapCutSub: 'Tap one piece of equipment in your photo', hintCutout: 'Tap the equipment you want as a part',
+  searchAll: 'Search', hideAssistant: 'Hide assistant', paletteHint: 'Search elements, tools, ideas and actions…',
+  groupElements: 'Elements', groupTools: 'Tools', groupIdeas: 'Ideas', groupActions: 'Actions', uploadPhoto: 'Upload a photo', nothingFound: 'Nothing found',
   cutout: 'Cut out', cutting: 'Cutting it out…', demoCut: 'Demo mode: draw around the part instead.',
 };
 type Dict = typeof en;
@@ -80,6 +82,8 @@ const ar: Dict = {
   subject: 'الموضوع', body: 'الرسالة', copy: 'نسخ', copied: 'تم النسخ', pasteBody: 'الرسالة طويلة: اضغط نسخ وبعدين الصقها في الإيميل.', openMail: 'افتح في البريد',
   pdf: 'PDF', pdfSub: 'صفحة للطباعة: قبل وبعد والشرح. اختار "حفظ كـ PDF".', printPdf: 'افتح صفحة الطباعة',
   tapCut: 'اضغط على المعدة عشان تقصها', tapCutSub: 'اضغط على قطعة وحدة في صورتك', hintCutout: 'اضغط على المعدة اللي تبيها كقطعة',
+  searchAll: 'بحث', hideAssistant: 'إخفاء المساعد', paletteHint: 'ابحث عن عناصر، أدوات، أفكار وأوامر…',
+  groupElements: 'العناصر', groupTools: 'الأدوات', groupIdeas: 'الأفكار', groupActions: 'أوامر', uploadPhoto: 'ارفع صورة', nothingFound: 'ما في نتيجة',
   cutout: 'قص', cutting: 'أقصها…', demoCut: 'وضع التجربة: ارسم حول القطعة بدالها.',
 };
 

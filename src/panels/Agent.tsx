@@ -108,6 +108,7 @@ export function Agent({ compact }: { compact: boolean }) {
         <span className="avatar" aria-hidden="true"><Icon name="spark" size={18} /></span>
         <span className="who"><h2>{t('assistant')}</h2><small>{t('assistantSub')}</small></span>
         <button className="icon-btn" title={t('memory')} aria-label={t('memory')} onClick={() => set({ sheet: 'memory' })}><Icon name="book" /></button>
+        {!compact && <button className="icon-btn" title={t('hideAssistant')} aria-label={t('hideAssistant')} onClick={() => set({ thread: false })}><Icon name="close" /></button>}
       </header>
       <div className="messages" ref={list} aria-live="polite">
         {!messages?.length && (
@@ -132,7 +133,6 @@ export function Agent({ compact }: { compact: boolean }) {
         ))}
         {busy && busy.stage !== 'saving' && <div className="msg from-agent typing"><span className="dots" aria-hidden="true"><i /><i /><i /></span>{busy.text}</div>}
       </div>
-      {!compact && <Composer />}
     </div>
   );
 }
