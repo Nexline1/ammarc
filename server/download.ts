@@ -38,7 +38,9 @@ function allow(ip: string) {
 }
 
 export function downloads(app: Express) {
-  app.get('/app', async (_req, res) => {
+  app.get('/app', async (req, res) => {
+    // iPhones can't install an APK: they get the Add to Home Screen steps instead.
+    if (/iPhone|iPad|iPod/.test(req.headers['user-agent'] ?? '')) return res.setHeader('Cache-Control', 'no-store').type('html').send(page(null, true));
     const apk = await latest().catch((e: Error) => (console.error(e.message), null));
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; img-src data:");
@@ -67,9 +69,25 @@ export function downloads(app: Express) {
 
 const mark = `<svg viewBox="0 0 32 32" width="44" height="44" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#16191D"/><path d="M9 23L16 8l7 15M11.5 18h9" fill="none" stroke="#E8743A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-function page(apk: Apk | null) {
+function page(apk: Apk | null, ios = false) {
   const mb = apk ? `${Math.round(apk.size / 1048576)} MB` : '';
-  const body = apk
+  const body = ios
+    ? `<p class="meta">On iPhone, Ammarc installs from Safari — no App Store needed.</p>
+       <ol>
+         <li>Open this site in <b>Safari</b> (not Chrome or the WhatsApp browser).</li>
+         <li>Tap the <b>Share</b> button (the square with an arrow).</li>
+         <li>Scroll down and tap <b>Add to Home Screen</b>, then <b>Add</b>.</li>
+         <li>Open <b>Ammarc</b> from the home screen and sign in.</li>
+       </ol>
+       <div dir="rtl" lang="ar" class="ar">
+         <ol>
+           <li>افتح الموقع في <b>Safari</b>.</li>
+           <li>اضغط زر <b>المشاركة</b> (المربع مع السهم).</li>
+           <li>انزل واضغط <b>إضافة إلى الشاشة الرئيسية</b> ثم <b>إضافة</b>.</li>
+           <li>افتح <b>Ammarc</b> من الشاشة الرئيسية وادخل.</li>
+         </ol>
+       </div>`
+    : apk
     ? `<a class="btn" href="/app/Ammarc.apk" download>Download for Android</a>
        <p class="meta">Version ${apk.version} · ${mb}</p>
        <ol>
@@ -87,7 +105,7 @@ function page(apk: Apk | null) {
        </div>`
     : `<p class="meta">The Android app isn't available here yet.<br><span dir="rtl" lang="ar">تطبيق الأندرويد مو متوفر هني للحين.</span></p>`;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${BRAND.name} for Android</title><meta name="robots" content="noindex">
+<title>${BRAND.name} for ${ios ? 'iPhone' : 'Android'}</title><meta name="robots" content="noindex">
 <style>
   :root{color-scheme:light}
   body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#16191d;background:radial-gradient(120% 80% at 50% 0%,#f6f7f9,#e6e9ed)}
@@ -104,9 +122,9 @@ function page(apk: Apk | null) {
   .web{display:block;margin-top:22px;text-align:center;color:#b04716;font-weight:600;text-decoration:none}
 </style></head><body><main>
 ${mark}
-<h1>${BRAND.name} for Android</h1>
+<h1>${BRAND.name} for ${ios ? 'iPhone' : 'Android'}</h1>
 <p class="tag">${BRAND.tagline}</p>
 ${body}
-<a class="web" href="/">Open in the browser instead · افتح في المتصفح</a>
+<a class="web" href="/">${ios ? 'Open Ammarc · افتح Ammarc' : 'Open in the browser instead · افتح في المتصفح'}</a>
 </main></body></html>`;
 }
