@@ -1,4 +1,5 @@
 // Cmd/Ctrl+K: one box to reach any element, tool, idea or action without hunting through panels.
+import { motion, useReducedMotion } from 'motion/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Project } from '../../shared/types.ts';
 import { api } from '../api.ts';
@@ -16,6 +17,7 @@ const TOOLS: [Tool, string][] = [['select', 'select'], ['pen', 'pen'], ['arrow',
 export function CommandPalette({ onPhoto }: { onPhoto: () => void }) {
   const t = useT();
   const lang = useStore((s) => s.lang);
+  const reduce = useReducedMotion();
   const hasImage = useStore((s) => !!s.project?.current);
   const [q, setQ] = useState('');
   const [at, setAt] = useState(0);
@@ -65,8 +67,11 @@ export function CommandPalette({ onPhoto }: { onPhoto: () => void }) {
 
   let lastGroup: Key | null = null;
   return (
-    <div className="palette-scrim" onMouseDown={(e) => e.target === e.currentTarget && close()}>
-      <div className="palette" role="dialog" aria-modal="true" aria-label={t('searchAll')} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+    <motion.div className="palette-scrim" onMouseDown={(e) => e.target === e.currentTarget && close()}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
+      <motion.div className="palette" role="dialog" aria-modal="true" aria-label={t('searchAll')} dir={lang === 'ar' ? 'rtl' : 'ltr'}
+        initial={reduce ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduce ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.98 }}
+        transition={reduce ? { duration: 0.12 } : { type: 'spring', bounce: 0, duration: 0.32 }}>
         <label className="palette-input">
           <Icon name="search" size={20} />
           <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={onKey} placeholder={t('paletteHint')} aria-label={t('paletteHint')}
@@ -89,7 +94,7 @@ export function CommandPalette({ onPhoto }: { onPhoto: () => void }) {
             );
           })}
         </ul>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

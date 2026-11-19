@@ -490,10 +490,12 @@ a.btn { text-decoration: none; }
 .wide .rail-btn { padding: 9px 2px 7px; border-radius: 13px; font-size: 10.5px; }
 .panel.float {
   position: absolute; z-index: 6; top: 68px; bottom: 16px; border: 0 !important; border-radius: 20px; overflow: hidden;
-  background: rgba(255, 255, 255, .88); animation: float-in .5s var(--ease-out) both;
+  background: rgba(255, 255, 255, .88);
 }
-.panel.left.float { left: 84px; width: 308px; --from: -14px; }
-.panel.right.float { right: 12px; width: 348px; --from: 14px; }
+.panel-swap { flex: 1; min-height: 0; display: flex; flex-direction: column; animation: swap-in .22s ease-out both; }
+@keyframes swap-in { from { opacity: 0; } }
+.panel.left.float { left: 84px; width: 308px; }
+.panel.right.float { right: 12px; width: 348px; }
 @keyframes float-in { from { opacity: 0; transform: translateX(var(--from)) scale(.985); } }
 .panel.float .panel-head { border-bottom-color: var(--hair); }
 .panel.float .tile, .panel.float .version-list button, .panel.float .action-card, .panel.float .example { background: rgba(255, 255, 255, .7); }
@@ -523,14 +525,12 @@ a.btn { text-decoration: none; }
 .wide .board-busy { padding-top: 70px; padding-left: var(--inset-l, 0px); padding-right: var(--inset-r, 0px); }
 
 /* Cmd/Ctrl+K palette */
-.palette-scrim { position: fixed; inset: 0; z-index: 70; display: flex; justify-content: center; align-items: flex-start; padding: 12vh 16px 16px; background: rgba(22, 25, 29, .28); animation: fade-in .2s ease both; }
-@keyframes fade-in { from { opacity: 0; } }
+.palette-scrim { position: fixed; inset: 0; z-index: 70; display: flex; justify-content: center; align-items: flex-start; padding: 12vh 16px 16px; background: rgba(22, 25, 29, .28); }
 .palette {
   width: min(620px, 100%); max-height: 70vh; display: flex; flex-direction: column; overflow: hidden; border-radius: 20px;
   background: rgba(255, 255, 255, .92); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
-  box-shadow: 0 0 0 1px var(--hair), 0 24px 80px rgba(22, 25, 29, .28); animation: pop-in .35s var(--ease-out) both;
+  box-shadow: 0 0 0 1px var(--hair), 0 24px 80px rgba(22, 25, 29, .28); transform-origin: 50% 0;
 }
-@keyframes pop-in { from { opacity: 0; transform: translateY(-8px) scale(.98); } }
 .palette-input { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--hair); color: var(--ink-400); }
 .palette-input input { border: 0; box-shadow: none !important; padding: 4px 0; font-size: 16px; background: transparent; color: var(--ink-900); }
 .palette-list { list-style: none; margin: 0; padding: 6px; overflow-y: auto; }
@@ -546,4 +546,14 @@ html[lang="ar"] .palette-group { letter-spacing: 0; text-transform: none; }
 
 @media (prefers-reduced-transparency: reduce) {
   .glass, .wide .topbar .wordmark, .wide .project-name, .search-btn, .wide .rail, .panel.float, .command-bar, .palette { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
+/* Apple pass: chrome centred on the free space follows the panels as they fold (same curve as the photo's glide). */
+.wide .command-bar, .wide .toolbar, .wide .bottombar, .wide .tool-hint, .wide .hint { transition: left .5s var(--ease-out), width .5s var(--ease-out); }
+/* Vibrancy: small grey text on glass gets a touch more weight so it holds up over a busy photo. */
+.search-btn, .wide .rail-btn, .wide .project-name { font-weight: 600; }
+.search-btn { letter-spacing: .005em; }
+/* Hover is a quiet lift on laptops only; the press is still instant on pointer-down. */
+@media (hover: hover) {
+  .wide .rail-btn:hover:not(.on), .wide .tb-btn:hover:not(:disabled), .search-btn:hover { background: rgba(22, 25, 29, .045); }
 }

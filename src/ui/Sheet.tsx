@@ -1,11 +1,12 @@
 // Bottom sheet on phones (drag the handle down to close), centred modal on laptops.
 import { AnimatePresence, motion, useDragControls, useReducedMotion } from 'motion/react';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { Icon } from './Icon.tsx';
 
 export function Sheet({ open, onClose, title, wide, children, size = 'md', hidden = false }: { open: boolean; onClose: () => void; title: string; wide: boolean; children: ReactNode; size?: 'md' | 'lg'; hidden?: boolean }) {
   const reduce = useReducedMotion();
   const controls = useDragControls();
+  const el = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!open) return;
     const esc = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -21,6 +22,7 @@ export function Sheet({ open, onClose, title, wide, children, size = 'md', hidde
           <motion.div key="scrim" className={`scrim${hidden ? ' drag-hidden' : ''}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} onClick={onClose} />
           <motion.div
             key="sheet"
+            ref={el}
             role="dialog"
             aria-modal="true"
             aria-label={title}
@@ -34,7 +36,11 @@ export function Sheet({ open, onClose, title, wide, children, size = 'md', hidde
             dragListener={false}
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0.05, bottom: 0.7 }}
-            onDragEnd={(_, info) => { if (info.offset.y > 110 || info.velocity.y > 650) onClose(); }}
+            onDragEnd={(_, info) => {
+              // Where the flick is going, not where it let go (Apple's scroll deceleration, d = 0.998); an upward flick always keeps it.
+              const end = info.offset.y + (info.velocity.y / 1000) * 0.998 / 0.002;
+              if (info.velocity.y > -100 && end > (el.current?.offsetHeight ?? 600) * 0.4) onClose();
+            }}
           >
             <header className="sheet-head" onPointerDown={(e) => !wide && controls.start(e)}>
               {!wide && <span className="grabber" aria-hidden="true" />}

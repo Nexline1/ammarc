@@ -2,6 +2,7 @@
 // World coordinates = pixels of the current base image.
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type Konva from 'konva';
+import { animate } from 'motion/react';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { Arrow, Circle, Group, Image as KImage, Label, Layer, Line, Rect, Stage, Tag, Text, Transformer } from 'react-konva';
 import type { Mark, SceneElement } from '../../shared/types.ts';
@@ -84,7 +85,11 @@ export function Board({ onFiles, insets }: { onFiles: (files: FileList) => void;
   const layerRef = useRef<Konva.Layer>(null);
   const trRef = useRef<Konva.Transformer>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
-  const [view, setView] = useState<View>({ scale: 1, x: 0, y: 0 });
+  const [view, setViewRaw] = useState<View>({ scale: 1, x: 0, y: 0 });
+  // Re-fits glide on a critically damped spring from the live view; any touch, pan or zoom stops the glide on the spot.
+  const glide = useRef<{ stop(): void } | null>(null);
+  const fitted = useRef('');
+  const setView: typeof setViewRaw = (v) => { glide.current?.stop(); glide.current = null; setViewRaw(v); };
   const viewRef = useRef(view);
   viewRef.current = view;
   const [draft, setDraft] = useState<Mark | null>(null);
@@ -115,7 +120,17 @@ export function Board({ onFiles, insets }: { onFiles: (files: FileList) => void;
 
   const fit = useCallback(() => {
     if (!W || !box.w) return;
-    setView({ scale: fitScale, x: ins.l + pad + (room.w - W * fitScale) / 2, y: ins.t + pad + (room.h - H * fitScale) / 2 });
+    const to = { scale: fitScale, x: ins.l + pad + (room.w - W * fitScale) / 2, y: ins.t + pad + (room.h - H * fitScale) / 2 };
+    const img = `${W}x${H}`, from = viewRef.current;
+    const still = fitted.current !== img || matchMedia('(prefers-reduced-motion: reduce)').matches;
+    fitted.current = img;
+    if (still) return setView(to); // a new photo lands in place; only re-fits of the same photo move
+    glide.current?.stop();
+    const g = animate(0, 1, {
+      type: 'spring', bounce: 0, duration: 0.5,
+      onUpdate: (t) => setViewRaw({ scale: from.scale + (to.scale - from.scale) * t, x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t }),
+    });
+    glide.current = g;
   }, [W, H, box.w, box.h, fitScale, ins.l, ins.t, pad, room.w, room.h]);
   useEffect(fit, [fit]);
 
@@ -204,6 +219,7 @@ export function Board({ onFiles, insets }: { onFiles: (files: FileList) => void;
   };
 
   const onPointerDown = (e: KonvaEventObject<PointerEvent>) => {
+    glide.current?.stop(); glide.current = null; // grab it mid-flight: the photo stays where his finger found it
     const evt = e.evt;
     const p = local(evt);
     pointers.current.set(evt.pointerId, p);

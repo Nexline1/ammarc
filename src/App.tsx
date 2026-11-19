@@ -1,3 +1,4 @@
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { BRAND, type Project } from '../shared/types.ts';
 import { api, fileUrl, setAuthHandler } from './api.ts';
@@ -137,22 +138,26 @@ function Studio() {
             ? <div className="hint" role="status">{hint}<button className="icon-btn sm" aria-label={t('close')} onClick={() => set({ hint: null, awaiting: null, tool: 'select' })}><Icon name="close" size={14} /></button></div>
             : hasImage && <ToolHint />}
           {wide && <Rail />}
-          {wide && left && (
-            <aside key={left} className="panel left float" aria-label={t(RAIL.find((r) => r.id === left)!.label)}>
-              {left === 'elements' && <Library compact={false} tab="elements" />}
-              {left === 'parts' && <Library compact={false} tab="parts" />}
-              {left === 'versions' && <div className="panel-scroll"><h2 className="panel-title">{t('versions')}</h2><Versions /></div>}
-              {left === 'ideas' && <div className="panel-scroll"><h2 className="panel-title">{t('ideas')}</h2><Projects /></div>}
-            </aside>
-          )}
-          {wide && thread && <aside className="panel right float" aria-label={t('assistant')}><Agent compact={false} /></aside>}
+          <AnimatePresence initial={false}>
+            {wide && left && (
+              <Float key="left" side="left" label={t(RAIL.find((r) => r.id === left)!.label)}>
+                <div key={left} className="panel-swap">
+                  {left === 'elements' && <Library compact={false} tab="elements" />}
+                  {left === 'parts' && <Library compact={false} tab="parts" />}
+                  {left === 'versions' && <div className="panel-scroll"><h2 className="panel-title">{t('versions')}</h2><Versions /></div>}
+                  {left === 'ideas' && <div className="panel-scroll"><h2 className="panel-title">{t('ideas')}</h2><Projects /></div>}
+                </div>
+              </Float>
+            )}
+            {wide && thread && <Float key="right" side="right" label={t('assistant')}><Agent compact={false} /></Float>}
+          </AnimatePresence>
           {wide && <CommandBar />}
           {compare && <Compare />}
           {!wide && <LastReply />}
           {wide && !thread && <LastReply />}
         </section>
       </main>
-      {palette && <CommandPalette onPhoto={() => fileInput.current?.click()} />}
+      <AnimatePresence>{palette && <CommandPalette key="palette" onPhoto={() => fileInput.current?.click()} />}</AnimatePresence>
 
       {!wide && <Dock />}
       <input ref={fileInput} type="file" accept="image/*" hidden onChange={(e) => { if (e.target.files) onFiles(e.target.files); e.target.value = ''; }} />
@@ -193,6 +198,19 @@ function Rail() {
         </button>
       ))}
     </nav>
+  );
+}
+
+/** A floating glass panel: springs in from its own edge and leaves the same way (critically damped, interruptible). */
+function Float({ side, label, children }: { side: 'left' | 'right'; label: string; children: React.ReactNode }) {
+  const reduce = useReducedMotion();
+  const away = reduce ? { opacity: 0 } : { opacity: 0, x: side === 'left' ? -18 : 18, scale: 0.985 };
+  return (
+    <motion.aside className={`panel ${side} float`} aria-label={label} style={{ transformOrigin: side === 'left' ? '0 50%' : '100% 50%' }}
+      initial={away} animate={{ opacity: 1, x: 0, scale: 1 }} exit={away}
+      transition={reduce ? { duration: 0.15 } : { type: 'spring', bounce: 0, duration: 0.4 }}>
+      {children}
+    </motion.aside>
   );
 }
 
