@@ -4,21 +4,16 @@ services:
   - type: web
     name: ammarc
     runtime: node
-    plan: starter            # needed for the persistent disk (free instances lose files on every restart)
+    plan: free               # free: sleeps after 15 min idle, and files reset on every restart/deploy.
+                             # To keep his projects, switch to starter and add back: disk { name: ammarc-data, mountPath: /var/data, sizeGB: 1 } + DATA_DIR=/var/data
     region: frankfurt        # closest Render region to Bahrain
     buildCommand: npm ci && npm run build
     startCommand: npm start
     healthCheckPath: /api/status
     autoDeploy: true         # every push to main redeploys
-    disk:
-      name: ammarc-data      # projects, photos, versions, rules, parts
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
       - key: NODE_VERSION
         value: "24"
-      - key: DATA_DIR
-        value: /var/data
       - key: HOST
         value: 0.0.0.0
       - key: APP_PASSWORD     # Render asks for it when you create the service; the app won't start on Render without it
