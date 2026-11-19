@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       url:
-        description: 'Ammarc address baked into a release APK (e.g. https://ammarc.onrender.com). Empty = the app asks once.'
+        description: 'Ammarc address baked into the release APK. Empty = the live Render site.'
         required: false
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
       - name: Debug APK (talks to the demo server at 10.0.2.2:5180)
         run: flutter build apk --debug --dart-define=AMMARC_URL=http://10.0.2.2:5180
       - name: Release APK
-        run: flutter build apk --release --dart-define=AMMARC_URL=${{ inputs.url }}
+        run: flutter build apk --release --dart-define=AMMARC_URL=${{ inputs.url || 'https://ammarc-d68t.onrender.com' }}
       - uses: actions/upload-artifact@v4
         with:
           name: ammarc-apks
