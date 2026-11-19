@@ -1,23 +1,26 @@
-# Ammarc for phones (Flutter)
+# Ammarc, native (Flutter)
 
-A native shell around the live Ammarc site. Everything Ammar does on the web works here, and every web update reaches the app without a store release. The app adds what a browser tab does badly:
+The same Ammarc loop as the website, written natively: its own board, gestures and drawing, talking to the same server (`/api/*`). One codebase builds:
 
-- **Photos:** "Upload a photo" offers *Take a photo* or *Choose from photos*.
-- **Voice:** asks for the microphone once, then the mic button works (needs the site on https).
-- **Exports:** PNG, slide and deck downloads open the share sheet (WhatsApp, email, Files).
-- **Mail links** open the mail app; **Back** closes the open sheet before leaving.
-- PDF printing is hidden in the app (WebViews have no print dialog); the deck and PNG cover it.
+- **Android:** an APK (GitHub Actions → Releases, and the download at `/app`).
+- **iPhone:** the web build, served by the Ammarc server at **`/m`**. In Safari: Share → **Add to Home Screen**. No App Store account needed.
+
+## What's in it
+
+Sign in · ideas · photo (camera/gallery) or blank board · pinch/pan, double-tap to fit · tools: move, mark, point, arrow, note, erase · elements library (search EN/AR, move, resize, rotate, flip) · type or say one sentence → Claude's plan → masked render with live preview and byte-identical paste-back (`lib/raster.dart`, ported from `src/canvas/raster.ts`) → new version → background check · chat with one-tap chips, fixes and rules · view chips (side, cutaway, exploded, 3D) · versions · before/after · undo/redo · share picture, pitch, supervisor email · English/Arabic (RTL).
+
+Not yet (use the website): dimension/scale tool, My parts and cut-outs, PowerPoint deck, PDF.
 
 ## Build
 
-CI builds it (`.github/workflows/mobile.yml`): analyze, tests, a debug APK, and an emulator smoke test against the demo server. To build by hand with Flutter installed:
-
 ```bash
 cd mobile
-flutter create --org com.nexline --project-name ammarc --platforms android,ios .
+flutter create --org com.nexline --project-name ammarc --platforms android,ios,web .
 python3 tool/platforms.py
 dart run flutter_launcher_icons
-flutter build apk --release --dart-define=AMMARC_URL=https://YOUR-RENDER-URL
+flutter test
+flutter build apk --release                    # opens https://ammarc-d68t.onrender.com
+flutter build web --release --base-href /m/    # copy build/web to ../dist/m
 ```
 
-Without `AMMARC_URL` the app asks for the address once and remembers it. iPhone builds need a Mac with Xcode (`flutter build ipa`); add `PERMISSION_MICROPHONE=1` to the Podfile's `GCC_PREPROCESSOR_DEFINITIONS` for permission_handler.
+`--dart-define=AMMARC_URL=…` points the Android build at another server. Render runs `tool/build-web.sh` after the website build, so `/m` stays in step with every deploy.

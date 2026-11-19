@@ -23,7 +23,7 @@ jobs:
         with: { channel: stable, cache: true }
       - name: Generate platforms
         run: |
-          flutter create --org com.nexline --project-name ammarc --platforms android,ios .
+          flutter create --org com.nexline --project-name ammarc --platforms android,ios,web .
           git checkout -- test lib   # flutter create may add its own sample test
           rm -f test/widget_test.dart
           python3 tool/platforms.py
@@ -35,6 +35,8 @@ jobs:
         run: flutter build apk --debug --dart-define=AMMARC_URL=http://10.0.2.2:5180
       - name: Release APK
         run: flutter build apk --release --dart-define=AMMARC_URL=${{ inputs.url || 'https://ammarc-d68t.onrender.com' }}
+      - name: Web build (the iPhone home-screen app, served at /m)
+        run: flutter build web --release --base-href /m/
       - uses: actions/upload-artifact@v4
         with:
           name: ammarc-apks

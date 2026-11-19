@@ -1,5 +1,5 @@
 name: ammarc
-description: Ammarc on the phone — the live site plus camera, mic, share sheet and back button.
+description: Ammarc, native — the same server and loop as the website, with its own screens, gestures and drawing.
 publish_to: none
 version: 1.0.0+1
 
@@ -9,14 +9,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  webview_flutter: ^4.10.0
-  webview_flutter_android: ^4.3.0
-  image_picker: ^1.1.2
-  path_provider: ^2.1.4
-  permission_handler: ^11.3.1
-  share_plus: ^11.0.0
+  http: ^1.2.2
   shared_preferences: ^2.3.2
-  url_launcher: ^6.3.0
+  image_picker: ^1.1.2
+  flutter_svg: ^2.0.10
+  record: ^6.0.0
+  share_plus: ^11.0.0
 
 dev_dependencies:
   flutter_test:
@@ -30,6 +28,11 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
+  web:
+    generate: true
+    image_path: assets/icon.png
+    background_color: "#F3F4F6"
+    theme_color: "#F3F4F6"
   image_path: assets/icon.png
   adaptive_icon_background: "#16191D"
   adaptive_icon_foreground: assets/icon-fg.png

@@ -74,14 +74,14 @@ function page(apk: Apk | null, ios = false) {
   const body = ios
     ? `<p class="meta">On iPhone, Ammarc installs from Safari — no App Store needed.</p>
        <ol>
-         <li>Open this site in <b>Safari</b> (not Chrome or the WhatsApp browser).</li>
+         <li>Open <a href="/m/"><b>this link</b></a> in <b>Safari</b> (not Chrome or the WhatsApp browser).</li>
          <li>Tap the <b>Share</b> button (the square with an arrow).</li>
          <li>Scroll down and tap <b>Add to Home Screen</b>, then <b>Add</b>.</li>
          <li>Open <b>Ammarc</b> from the home screen and sign in.</li>
        </ol>
        <div dir="rtl" lang="ar" class="ar">
          <ol>
-           <li>افتح الموقع في <b>Safari</b>.</li>
+           <li>افتح <a href="/m/"><b>هذا الرابط</b></a> في <b>Safari</b>.</li>
            <li>اضغط زر <b>المشاركة</b> (المربع مع السهم).</li>
            <li>انزل واضغط <b>إضافة إلى الشاشة الرئيسية</b> ثم <b>إضافة</b>.</li>
            <li>افتح <b>Ammarc</b> من الشاشة الرئيسية وادخل.</li>
@@ -125,6 +125,6 @@ ${mark}
 <h1>${BRAND.name} for ${ios ? 'iPhone' : 'Android'}</h1>
 <p class="tag">${BRAND.tagline}</p>
 ${body}
-<a class="web" href="/">${ios ? 'Open Ammarc · افتح Ammarc' : 'Open in the browser instead · افتح في المتصفح'}</a>
+<a class="web" href="${ios ? '/m/' : '/'}">${ios ? 'Open Ammarc · افتح Ammarc' : 'Open in the browser instead · افتح في المتصفح'}</a>
 </main></body></html>`;
 }

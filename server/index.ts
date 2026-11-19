@@ -8,6 +8,7 @@ import { compilePrompt } from './compile.ts';
 import * as store from './store.ts';
 import * as mock from './mock.ts';
 import { downloads } from './download.ts';
+import { CATEGORIES, ITEMS } from '../src/elements/catalog.ts';
 
 const DEV = process.argv.includes('--dev');
 const PORT = Number(process.env.PORT || 5180);
@@ -167,6 +168,9 @@ app.post('/api/cutout', rate, json, async (req, res) => {
   res.json({ b64: await images.cutout(c.image, c.size) });
 });
 
+// The element library for the native app (the website bundles the same list).
+app.get('/api/catalog', (_req, res) => res.json({ categories: CATEGORIES, items: ITEMS }));
+
 app.get('/api/parts',(_req, res) => res.json(store.getParts()));
 app.post('/api/parts', json, (req, res) => {
   store.addPart(body(z.object({ file: z.string(), name: z.string().min(1).max(60) }), req));
@@ -200,6 +204,8 @@ if (DEV) {
   app.use(vite.middlewares);
 } else {
   const dist = path.resolve('dist');
+  // The native Flutter app's web build (iPhone: Safari → Add to Home Screen). Built by mobile/tool/build-web.sh.
+  app.use('/m', express.static(path.join(dist, 'm'), { maxAge: '1h' }));
   app.use(express.static(dist, { index: false, maxAge: '1h' }));
   app.get('/{*splat}', (_req, res) => res.sendFile(path.join(dist, 'index.html')));
 }

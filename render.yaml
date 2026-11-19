@@ -7,7 +7,7 @@ services:
     plan: free               # free: sleeps after 15 min idle, and files reset on every restart/deploy.
                              # To keep his projects, switch to starter and add back: disk { name: ammarc-data, mountPath: /var/data, sizeGB: 1 } + DATA_DIR=/var/data
     region: frankfurt        # closest Render region to Bahrain
-    buildCommand: npm ci && npm run build
+    buildCommand: npm ci && npm run build && bash mobile/tool/build-web.sh   # the last step adds the native app at /m (skipped if Flutter fails)
     startCommand: npm start
     healthCheckPath: /api/status
     autoDeploy: true         # every push to main redeploys
