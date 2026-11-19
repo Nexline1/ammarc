@@ -1,7 +1,6 @@
 // Talks to the same Ammarc server as the website. On the web (iPhone home-screen app) it is served by that
 // server, so it uses its own origin and the browser keeps the sign-in cookie; on Android it keeps the cookie itself.
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;

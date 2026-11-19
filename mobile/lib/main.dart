@@ -3,10 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'raster.dart' show ink;
 import 'state.dart';
 import 'studio.dart';
 
-const ink = Color(0xFF16191D);
 const copper = Color(0xFFCF5A1E);
 const muted = Color(0xFF5B636E);
 

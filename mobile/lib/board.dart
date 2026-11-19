@@ -53,7 +53,7 @@ class _BoardViewState extends State<BoardView> {
     if (v?.file != baseFile) {
       baseFile = v?.file;
       final keepView = base != null && v != null;
-      final img = v == null ? null : await loadImage(Api.i.fileUrl(v.file)).catchError((_) => base!);
+      final img = v == null ? null : await loadImage(Api.i.fileUrl(v.file)).then<ui.Image?>((i) => i, onError: (_) => base);
       if (!mounted || baseFile != v?.file) return;
       final sameSize = img != null && base != null && img.width == base!.width && img.height == base!.height;
       setState(() {

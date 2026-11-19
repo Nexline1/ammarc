@@ -54,7 +54,6 @@ class _StudioState extends State<Studio> {
     return ListenableBuilder(
       listenable: s,
       builder: (context, _) {
-        final t = s.t;
         final p = s.project;
         final hasImage = p?.current != null;
         return Scaffold(
