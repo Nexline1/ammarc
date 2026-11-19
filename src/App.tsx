@@ -38,7 +38,7 @@ export function App() {
     setAuthHandler(() => set((s) => ({ status: s.status && { ...s.status, authed: false } })));
     api.get<NonNullable<State['status']>>('/api/status').then((st) => {
       set({ status: st });
-      if (!st.auth || st.authed) void boot();
+      if (!st.auth || st.authed) boot().catch((e) => set({ toast: `Could not open your work: ${e instanceof Error ? e.message : e}` }));
     }).catch(() => set({ toast: 'Server not reachable.' }));
   }, []);
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);

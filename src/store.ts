@@ -57,7 +57,9 @@ export function set(patch: Partial<State> | ((s: State) => Partial<State>)) {
 /** Select a value that already lives in the state (no new objects, or React re-renders forever). */
 export const useStore = <T,>(sel: (s: State) => T): T => useSyncExternalStore(subscribe, () => sel(state));
 
-export const uid = () => crypto.randomUUID().slice(0, 12);
+// randomUUID only exists on https/localhost; a phone opening the PC over plain http still needs ids (getRandomValues works everywhere).
+const uuid = (): string => crypto.randomUUID?.() ?? '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c) => (+c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16));
+export const uid = () => uuid().slice(0, 12);
 let toastTimer = 0;
 export function toast(text: string) {
   set({ toast: text });
@@ -111,7 +113,7 @@ export function redo() {
 }
 
 export function newProject(name = 'Untitled idea'): Project {
-  return { id: crypto.randomUUID(), name, updatedAt: Date.now(), versions: [], current: null, scene: { elements: [], marks: [] }, messages: [] };
+  return { id: uuid(), name, updatedAt: Date.now(), versions: [], current: null, scene: { elements: [], marks: [] }, messages: [] };
 }
 export async function openProject(p: Project) {
   if (state.busy) { toast(state.lang === 'ar' ? 'لحظة — أخلص التعديل الحالي.' : 'One moment — finishing the current change.'); return; }
