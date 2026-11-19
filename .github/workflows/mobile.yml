@@ -26,7 +26,7 @@ jobs:
           python3 tool/platforms.py
           flutter pub get
           dart run flutter_launcher_icons
-      - run: flutter analyze
+      - run: flutter analyze --no-fatal-infos   # infos (e.g. material → material_ui move) are advice, not failures
       - run: flutter test
       - name: Debug APK (talks to the demo server at 10.0.2.2:5180)
         run: flutter build apk --debug --dart-define=AMMARC_URL=http://10.0.2.2:5180
