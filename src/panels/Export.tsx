@@ -24,6 +24,9 @@ function crop(src: HTMLCanvasElement, c: Crop): HTMLCanvasElement {
   return out;
 }
 
+// The phone app's WebView has no print dialog; there the deck and PNG go out through the share sheet instead.
+const IN_APP = navigator.userAgent.includes('AmmarcApp');
+
 const fileName = (s: string) => s.replace(/[\\/:*?"<>|]+/g, ' ').trim().slice(0, 60) || BRAND.name;
 
 function save(blob: Blob, name: string) {
@@ -230,7 +233,7 @@ export function ExportSheet() {
         </div>
         <div className="row">
           <button className="btn primary" disabled={!!busy} onClick={() => void slide()}><Icon name="export" size={18} />{t('download')} .pptx</button>
-          <button className="btn" disabled={!!busy} onClick={() => void pdf()} title={t('pdfSub')}><Icon name="image" size={18} />{t('pdf')}</button>
+          {!IN_APP && <button className="btn" disabled={!!busy} onClick={() => void pdf()} title={t('pdfSub')}><Icon name="image" size={18} />{t('pdf')}</button>}
         </div>
         <p className="muted small">{tr(lang, 'concept')}</p>
       </section>
