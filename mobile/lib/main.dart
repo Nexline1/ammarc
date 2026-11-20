@@ -47,8 +47,9 @@ class _Splash extends StatelessWidget {
 }
 
 class Wordmark extends StatelessWidget {
-  const Wordmark({super.key, this.size = 18});
+  const Wordmark({super.key, this.size = 18, this.markOnly = false});
   final double size;
+  final bool markOnly; // just the "A": the phone's top bar needs the room for the idea's name
   @override
   Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, textDirection: TextDirection.ltr, children: [
         Container(
@@ -57,8 +58,8 @@ class Wordmark extends StatelessWidget {
           alignment: Alignment.center,
           child: Text('A', style: TextStyle(color: const Color(0xFFE8743A), fontWeight: FontWeight.w800, fontSize: size)),
         ),
-        SizedBox(width: size * 0.45),
-        Text('Ammarc', style: TextStyle(fontSize: size, fontWeight: FontWeight.w800, letterSpacing: -0.02 * size, color: ink)),
+        if (!markOnly) SizedBox(width: size * 0.45),
+        if (!markOnly) Text('Ammarc', style: TextStyle(fontSize: size, fontWeight: FontWeight.w800, letterSpacing: -0.02 * size, color: ink)),
       ]);
 }
 

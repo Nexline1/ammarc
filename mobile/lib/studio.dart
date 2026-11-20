@@ -92,11 +92,11 @@ class _TopBar extends StatelessWidget {
     final s = AppState.i;
     return Container(
       height: 54,
-      padding: const EdgeInsetsDirectional.only(start: 12, end: 4),
+      padding: const EdgeInsetsDirectional.only(start: 10, end: 2),
       decoration: const BoxDecoration(color: Colors.white, border: Border(bottom: BorderSide(color: Color(0x14000000)))),
       child: Row(children: [
-        const Wordmark(size: 15),
-        const SizedBox(width: 6),
+        const Wordmark(size: 16, markOnly: true),
+        const SizedBox(width: 4),
         Expanded(
           child: TextButton(
             onPressed: onIdeas,
@@ -113,9 +113,9 @@ class _TopBar extends StatelessWidget {
             decoration: BoxDecoration(color: const Color(0xFFFDF4EE), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFFF6C4A2))),
             child: Text(s.t('demo'), style: const TextStyle(fontSize: 11, color: Color(0xFF8C3813), fontWeight: FontWeight.w600)),
           ),
-        IconButton(tooltip: s.t('undo'), onPressed: s.canUndo ? s.undo : null, icon: const Icon(Icons.undo_rounded)),
-        IconButton(tooltip: s.t('redo'), onPressed: s.canRedo ? s.redo : null, icon: const Icon(Icons.redo_rounded)),
-        TextButton(onPressed: () => s.setLang(s.lang == 'en' ? 'ar' : 'en'), child: Text(s.lang == 'en' ? 'عربي' : 'EN')),
+        IconButton(visualDensity: VisualDensity.compact, tooltip: s.t('undo'), onPressed: s.canUndo ? s.undo : null, icon: const Icon(Icons.undo_rounded)),
+        IconButton(visualDensity: VisualDensity.compact, tooltip: s.t('redo'), onPressed: s.canRedo ? s.redo : null, icon: const Icon(Icons.redo_rounded)),
+        TextButton(style: TextButton.styleFrom(minimumSize: const Size(40, 40), padding: const EdgeInsets.symmetric(horizontal: 8)), onPressed: () => s.setLang(s.lang == 'en' ? 'ar' : 'en'), child: Text(s.lang == 'en' ? 'عربي' : 'EN')),
       ]),
     );
   }
